@@ -1,6 +1,7 @@
 extends Node2D
 @onready var hand: Node2D = $hand
 
+const COLLISION_MASK_CARD : int = 1
 		
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
@@ -66,6 +67,7 @@ func get_top_card_at_position(global_click_pos: Vector2) -> Node2D:
 	# Set up a physics point query at the mouse position
 	var query := PhysicsPointQueryParameters2D.new()
 	query.position = global_click_pos
+	query.collision_mask = COLLISION_MASK_CARD
 	query.collide_with_areas = true
 	query.collide_with_bodies = false # Ignore player/walls, only look for card Areas
 	
