@@ -35,7 +35,7 @@ func _ready() -> void:
 	
 	# TODO: build and assign starting deck instead of placeholder
 	var Strike : CardData = load("res://cards/Strike.tres")
-	for i in range(12):
+	for i in range(13):
 		starting_deck.append(Strike)
 	
 	#randomize() seed the global RNG for shuffle()
@@ -52,6 +52,8 @@ func build_deck() -> void:
 
 func draw_card() -> void:
 	if deck.size() == 0:
+		# small pause before playing shuffle animation
+		await get_tree().create_timer(.5).timeout
 		await shuffle_discard_into_deck()
 		# small pause before next draw animation
 		await get_tree().create_timer(.15).timeout
@@ -105,7 +107,7 @@ func discard_hand() -> void:
 	
 func shuffle_discard_into_deck() -> void:
 	# This dictates how long to wait between each card's movement (in seconds)
-	var stagger_delay: float = 0.15 
+	var stagger_delay: float = 0.1 
 	
 	# first, animate the shuffle
 	var final_tween : Tween
@@ -118,7 +120,7 @@ func shuffle_discard_into_deck() -> void:
 		
 		var tween: Tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 		tween.parallel().tween_callback(card.get_node("animation").play.bind("reverse_flip_card")).set_delay(card_delay)
-		tween.parallel().tween_property(card, "position", final_pos, 0.25).set_delay(card_delay)
+		tween.parallel().tween_property(card, "position", final_pos, 0.2).set_delay(card_delay)
 		final_tween = tween
 		
 	# wait for animation to finish
@@ -164,7 +166,7 @@ func deal_to_hand(new_card : Card = null) -> void:
 		var tween : Tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 		# play the flip card animation only if this is a new card
 		if i == new_card:
-			tween.parallel().tween_callback(i.get_node("animation").play.bind("flip_card"))
+			tween.parallel().tween_callback(i.get_node("animation").play.bind("flip_card")).set_delay(card_delay)
 		tween.parallel().tween_property(i, "position", final_pos, 0.25).set_delay(card_delay)
 		tween.parallel().tween_property(i, "rotation", final_rot, 0.35).set_delay(card_delay)
 		final_tween = tween
