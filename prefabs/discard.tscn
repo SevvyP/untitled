@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://cwi7gb64qr5e"]
+
+[ext_resource type="Texture2D" uid="uid://booqbd5npgygp" path="res://sprites/card_pile_holder.png" id="1_q2jkr"]
+
+[node name="discard" type="Node2D" unique_id=1605040543]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1680593773]
+texture = ExtResource("1_q2jkr")

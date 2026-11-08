@@ -72,7 +72,6 @@ _data = {
 script = ExtResource("1_hyht8")
 
 [node name="Area2D" type="Area2D" parent="." unique_id=2009399787]
-position = Vector2(0, 80)
 metadata/_edit_group_ = true
 
 [node name="card_art" type="Sprite2D" parent="Area2D" unique_id=808336979]

@@ -13,12 +13,28 @@ func _unhandled_input(event: InputEvent) -> void:
 			top_card.stop_dragging()
 
 func _ready() -> void:
-	draw_card(5, null)
+	var Strike : CardData = load("res://cards/Strike.tres")
+	draw_card(5, Strike)
+	
+## end turn
+#func _on_button_pressed() -> void:
+	## resolve any actions
+	#
+	## discard hand
+	#
+	## enemy turn
+	#
+	## remove a turn from any x turn effects
+	#
+	## draw a new hand
+	#
+	## reset state variables
 
 
-func draw_card(amount: int, card_data):
+func draw_card(amount: int, card_data : CardData):
 	for i in range(amount):
 		var card_scene: Node2D = load("res://prefabs/card.tscn").instantiate()
+		card_scene.data = card_data
 		card_scene.scale = Vector2(.33, .33)
 		var start_pos : Vector2 = Vector2(-450, 0)
 		card_scene.position = start_pos
@@ -95,4 +111,3 @@ func get_top_card_at_position(global_click_pos: Vector2) -> Node2D:
 				highest_card = area
 				
 	return highest_card.get_parent()
-		

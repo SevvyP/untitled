@@ -1,4 +1,7 @@
 extends Node2D
+@onready var art : Sprite2D = $Area2D/card_art
+
+@export var data : CardData
 
 var is_dragging : bool = false 
 var in_hand_pos : Vector2
@@ -18,6 +21,15 @@ func _on_area_2d_mouse_exited() -> void:
 	z_index = 0
 	await tween_anim(1)
 	
+func _ready() -> void:
+	if data:
+		setup(data)
+	
+func setup(card_data : CardData) -> void:
+	data = card_data
+	if data.art:
+		art.texture = data.art
+
 func start_dragging():
 	is_dragging = true
 	
