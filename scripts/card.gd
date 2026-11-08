@@ -1,15 +1,25 @@
+class_name Card
 extends Node2D
 @onready var art : Sprite2D = $Area2D/card_art
 
 @export var data : CardData
+@export var index_in_hand : int # since we're keeping all nodes out
+@export var animations_disabled : bool
 
 var is_dragging : bool = false 
 var in_hand_pos : Vector2
 var in_hand_rot: float
 		
 func _process(_delta: float) -> void:
+	if animations_disabled:
+		$Area2D/CollisionShape2D.disabled = true
+	else:
+		$Area2D/CollisionShape2D.disabled = false
+	
 	if is_dragging:
 		global_position = get_global_mouse_position()
+		
+	if is_dragging or animations_disabled:
 		rotation = 0			
 
 func _on_area_2d_mouse_entered() -> void:

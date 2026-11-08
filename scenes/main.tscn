@@ -5,8 +5,9 @@
 [ext_resource type="Script" uid="uid://b033j3jwvile6" path="res://scripts/hand.gd" id="2_tbgi4"]
 [ext_resource type="PackedScene" uid="uid://cwi7gb64qr5e" path="res://prefabs/discard.tscn" id="3_sugp2"]
 [ext_resource type="Script" uid="uid://1qxa5um6kaat" path="res://scripts/discard.gd" id="4_jyhfs"]
+[ext_resource type="Script" uid="uid://bad21sxhga4fv" path="res://scripts/input_manager.gd" id="6_tefeu"]
 
-[node name="main" type="Node2D" unique_id=759941962]
+[node name="battle" type="Node2D" unique_id=759941962]
 script = ExtResource("1_0wfyh")
 
 [node name="hand" type="Node2D" parent="." unique_id=1982790566]
@@ -28,5 +29,8 @@ offset_top = 640.0
 offset_right = 264.0
 offset_bottom = 703.0
 text = "End turn"
+
+[node name="input_manager" type="Node2D" parent="." unique_id=1147601031]
+script = ExtResource("6_tefeu")
 
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

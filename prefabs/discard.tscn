@@ -6,3 +6,5 @@
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1680593773]
 texture = ExtResource("1_q2jkr")
+
+[node name="cards" type="Node2D" parent="." unique_id=390651955]
