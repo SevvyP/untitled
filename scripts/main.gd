@@ -133,6 +133,7 @@ func move_to_deck(card : Variant) -> void:
 		discard_reference.add_child(card_ref)
 		card_ref.global_position = discard_reference.global_position
 		deck.insert(0, card)
+		discard_top_card_reference.setup(card_ref.data)
 		var final_pos : Vector2 = deck_reference.global_position
 		var tween : Tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 		tween.parallel().tween_property(card_ref, "global_position", final_pos, .2)
