@@ -1,4 +1,3 @@
-# card_data.gd
 class_name CardData
 extends Resource
 
