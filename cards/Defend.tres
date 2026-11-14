@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://dkxy5syocqevi"]
+
+[ext_resource type="Texture2D" uid="uid://cpamk1avsjxct" path="res://sprites/defend.png" id="1_3c464"]
+[ext_resource type="Script" uid="uid://yegwd4iidb46" path="res://scripts/card_data.gd" id="2_blkgl"]
+
+[resource]
+script = ExtResource("2_blkgl")
+art = ExtResource("1_3c464")
+metadata/_custom_type_script = "uid://yegwd4iidb46"

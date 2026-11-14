@@ -23,7 +23,7 @@ position = Vector2(1740, 872)
 scale = Vector2(0.33, 0.33)
 script = ExtResource("4_jyhfs")
 
-[node name="Button" type="Button" parent="." unique_id=1904866195]
+[node name="end_turn" type="Button" parent="." unique_id=1904866195]
 offset_left = 96.0
 offset_top = 640.0
 offset_right = 264.0
@@ -33,4 +33,4 @@ text = "End turn"
 [node name="input_manager" type="Node2D" parent="." unique_id=1147601031]
 script = ExtResource("6_tefeu")
 
-[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="end_turn" to="." method="_on_button_pressed"]

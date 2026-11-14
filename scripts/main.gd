@@ -1,7 +1,9 @@
 extends Node2D
 @onready var hand_reference: Node2D = $hand
-@onready var discard_reference: Node2D = $discard.get_node("cards")
+@onready var discard_reference: Node2D = $discard
+@onready var discard_top_card_reference: Node2D = $discard.get_node("top_card")
 @onready var deck_reference: Node2D = $deck
+@onready var end_turn_reference: Button = $end_turn
 
 #@export var card_scene : PackedScene
 @export var starting_deck : Array[CardData] = []
@@ -14,6 +16,9 @@ const HAND_SIZE := 5
 	
 # end turn
 func _on_button_pressed() -> void:
+	# disable the button
+	end_turn_reference.disabled = true
+	
 	# resolve any actions
 	
 	# discard hand
@@ -28,6 +33,9 @@ func _on_button_pressed() -> void:
 		await draw_card()
 	
 	# reset state variables
+	
+	# re-enable end turn button
+	end_turn_reference.disabled = false
 
 func _ready() -> void:
 	# hacky way to prevent issues with the fiest card dealt
@@ -35,8 +43,12 @@ func _ready() -> void:
 	
 	# TODO: build and assign starting deck instead of placeholder
 	var Strike : CardData = load("res://cards/Strike.tres")
+	var Defend : CardData = load("res://cards/Defend.tres")
 	for i in range(13):
-		starting_deck.append(Strike)
+		if i % 2 == 0:
+			starting_deck.append(Strike)
+		else:
+			starting_deck.append(Defend)
 	
 	#randomize() seed the global RNG for shuffle()
 	build_deck()
@@ -58,12 +70,9 @@ func draw_card() -> void:
 		# small pause before next draw animation
 		await get_tree().create_timer(.15).timeout
 		
-	var card_scene: Card = load("res://prefabs/card.tscn").instantiate()
 	var card_data : CardData = deck.pop_back()
-	card_scene.scale = Vector2(.33, .33)
 	var start_pos : Vector2 = Vector2(deck_reference.position.x - hand_reference.position.x, 0) # deck offset from the hand position
-	card_scene.position = start_pos
-	card_scene.data = card_data
+	var card_scene = instantiate_card(card_data, start_pos, Vector2(.33, .33))
 	card_scene.index_in_hand = hand.size()
 	hand_reference.add_child(card_scene)
 	hand.append(card_scene)
@@ -71,70 +80,67 @@ func draw_card() -> void:
 	if deck.size() == 0:
 		deck_reference.get_node("card_back").visible = false
 		
-#func discard_card(card : Card) -> void:
-	#discard.append(card.data)
-	#var final_pos : Vector2 = Vector2($discard.position.x - hand_reference.position.x, 0) # discard offset from the hand position
-	#var tween : Tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	#tween.tween_property(card, "position", final_pos, .25)
-	#await tween.finished
-	#card.animations_disabled = true
-	#hand.remove_at(card.index_in_hand)
+func instantiate_card(card_data : CardData, start_pos : Vector2, scale : Vector2) -> Card:
+	var card_scene: Card = load("res://prefabs/card.tscn").instantiate()
+	card_scene.scale = scale
+	card_scene.position = start_pos
+	card_scene.data = card_data
+	return card_scene
+		
+func discard_card(card : Card) -> void:
+	discard.append(card.data)
+	var final_pos : Vector2 = Vector2($discard.position.x - hand_reference.position.x, 0) # discard offset from the hand position
+	var tween : Tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tween.parallel().tween_property(card, "position", final_pos, .1)
+	tween.parallel().tween_property(card, "rotation", 0, .1)
+	await tween.finished
+	hand.remove_at(card.index_in_hand)
+	discard_top_card_reference.visible = true
+	discard_top_card_reference.setup(card.data)
+	card.queue_free()
 		
 func discard_hand() -> void:
-	var stagger_delay: float = 0.15
-	var cards_to_discard: Array[Card] = hand.duplicate()
-
-	var max_delay: float = 0.0
-	var last_tween : Tween
-	for card in cards_to_discard:
-		var card_delay: float = card.index_in_hand * stagger_delay
-		max_delay = max(max_delay, card_delay)
-
-		var final_pos: Vector2 = discard_reference.position
-
-		var tween := get_tree().create_tween()
-		tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-		tween.parallel().tween_property(card, "position", final_pos, 0.25).set_delay(card_delay)
-		tween.parallel().tween_property(card, "rotation", 0, 0.35).set_delay(card_delay)
-		last_tween = tween
-		discard.append(card.data)
-		card.reparent(discard_reference)
-
-	await last_tween.finished
-	for card in discard_reference.get_children():
-		card.animations_disabled = true
+	while not hand.is_empty():
+		var card : Card = hand.pop_back()
+		await discard_card(card)
 	hand.clear()
 	
 func shuffle_discard_into_deck() -> void:
-	# This dictates how long to wait between each card's movement (in seconds)
-	var stagger_delay: float = 0.1 
-	
-	# first, animate the shuffle
-	var final_tween : Tween
-	var discard_cards = discard_reference.get_children()
-
-	for index in range(discard_cards.size()):
-		var card: Card = discard_cards[index]
-		var card_delay: float = index * stagger_delay
-		var final_pos: Vector2 = discard_reference.to_local(deck_reference.global_position)
-		
-		var tween: Tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-		tween.parallel().tween_callback(card.get_node("animation").play.bind("reverse_flip_card")).set_delay(card_delay)
-		tween.parallel().tween_property(card, "position", final_pos, 0.2).set_delay(card_delay)
-		final_tween = tween
-		
-	# wait for animation to finish
-	await final_tween.finished
-		
-	# update deck and discard references
-	for i in discard:
-		deck.append(i)
+	for card in discard:
+		await move_to_deck(card)
 	deck.shuffle()
 	deck_reference.get_node("card_back").visible = true
-	
-	for child in discard_reference.get_children():
-		child.queue_free()
+	discard_top_card_reference.visible = false
 	discard.clear()
+
+## Moves a card from the hand or discard to the top of the deck.[br]
+## Pass a Card if in hand, or CardData if in discard.[br]
+## NOTE: if we add additional piles (i.e. exhaust), this may need to be extended
+func move_to_deck(card : Variant) -> void:
+	assert(card is Card or card is CardData, "tried to move a non Card/CardData to deck")
+	# TODO: this is untested. create a card that moves something from hand to top of deck
+	if card is Card: # hand, already instantiated
+		deck.insert(0, card.data)
+		var final_pos : Vector2 = Vector2(deck_reference.position.x - hand_reference.position.x, 0) # deck offset from the hand position
+		var tween : Tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+		tween.parallel().tween_property(card, "position", final_pos, .2)
+		tween.parallel().tween_property(card, "rotation", 0, .2)
+		tween.parallel().tween_callback(card.get_node("animation").play.bind("reverse_flip_card"))
+		await tween.finished
+		hand.remove_at(card.index_in_hand)
+		card.queue_free()
+	else: # discard, need to instantiate and then free
+		var card_ref = instantiate_card(card, Vector2(0, 0), Vector2(1, 1))
+		discard_reference.add_child(card_ref)
+		deck.insert(0, card)
+		var final_pos : Vector2 = Vector2((deck_reference.position.x - discard_reference.position.x) * 3, 0) # deck offset from the discard position. multiply by 3 because scaled down by 3
+		var tween : Tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+		tween.parallel().tween_property(card_ref, "position", final_pos, .2)
+		tween.parallel().tween_callback(card_ref.get_node("animation").play.bind("reverse_flip_card"))
+		await tween.finished
+		card_ref.queue_free()
+		# if deck is empty, display the card back
+		deck_reference.get_node("card_back").visible = true
 	
 func deal_to_hand(new_card : Card = null) -> void:
 	var max_offset: float = 450.0

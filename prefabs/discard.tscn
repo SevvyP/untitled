@@ -1,10 +1,12 @@
 [gd_scene format=3 uid="uid://cwi7gb64qr5e"]
 
 [ext_resource type="Texture2D" uid="uid://booqbd5npgygp" path="res://sprites/card_pile_holder.png" id="1_q2jkr"]
+[ext_resource type="PackedScene" uid="uid://iw7vd3ak2efu" path="res://prefabs/card.tscn" id="2_bdf4r"]
 
 [node name="discard" type="Node2D" unique_id=1605040543]
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1680593773]
 texture = ExtResource("1_q2jkr")
 
-[node name="cards" type="Node2D" parent="." unique_id=390651955]
+[node name="top_card" parent="." unique_id=690046540 instance=ExtResource("2_bdf4r")]
+visible = false
