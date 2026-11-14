@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://bdl7xusvr57e5"]
+
+[ext_resource type="Script" uid="uid://pv4jwrwfe5sj" path="res://scripts/main.gd" id="1_0wfyh"]
+[ext_resource type="PackedScene" uid="uid://ckkuu3y8lf1xk" path="res://prefabs/deck.tscn" id="2_0wfyh"]
+[ext_resource type="Script" uid="uid://b033j3jwvile6" path="res://scripts/hand.gd" id="2_tbgi4"]
+[ext_resource type="PackedScene" uid="uid://cwi7gb64qr5e" path="res://prefabs/discard.tscn" id="3_sugp2"]
+[ext_resource type="Script" uid="uid://1qxa5um6kaat" path="res://scripts/discard.gd" id="4_jyhfs"]
+[ext_resource type="Script" uid="uid://bad21sxhga4fv" path="res://scripts/input_manager.gd" id="6_tefeu"]
+
+[node name="battle" type="Node2D" unique_id=759941962]
+script = ExtResource("1_0wfyh")
+
+[node name="hand" type="Node2D" parent="." unique_id=1982790566]
+position = Vector2(630, 872)
+script = ExtResource("2_tbgi4")
+
+[node name="deck" parent="." unique_id=731650845 instance=ExtResource("2_0wfyh")]
+position = Vector2(180, 872)
+scale = Vector2(0.33, 0.33)
+
+[node name="discard" parent="." unique_id=1605040543 instance=ExtResource("3_sugp2")]
+position = Vector2(1740, 872)
+scale = Vector2(0.33, 0.33)
+script = ExtResource("4_jyhfs")
+
+[node name="end_turn" type="Button" parent="." unique_id=1904866195]
+offset_left = 96.0
+offset_top = 640.0
+offset_right = 264.0
+offset_bottom = 703.0
+text = "End turn"
+
+[node name="input_manager" type="Node2D" parent="." unique_id=1147601031]
+script = ExtResource("6_tefeu")
+
+[connection signal="pressed" from="end_turn" to="." method="_on_button_pressed"]

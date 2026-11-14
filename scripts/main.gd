@@ -13,6 +13,7 @@ var hand : Array[Card] = []
 var discard : Array[CardData] = []
 
 const HAND_SIZE := 5
+const CARD_DEFAULT_SCALE := Vector2(.33, .33)
 	
 # end turn
 func _on_button_pressed() -> void:
@@ -71,27 +72,27 @@ func draw_card() -> void:
 		await get_tree().create_timer(.15).timeout
 		
 	var card_data : CardData = deck.pop_back()
-	var start_pos : Vector2 = Vector2(deck_reference.position.x - hand_reference.position.x, 0) # deck offset from the hand position
-	var card_scene = instantiate_card(card_data, start_pos, Vector2(.33, .33))
+	var start_pos : Vector2 = deck_reference.global_position
+	var card_scene = instantiate_card(card_data)
 	card_scene.index_in_hand = hand.size()
 	hand_reference.add_child(card_scene)
+	card_scene.global_position = start_pos
+	card_scene.scale = CARD_DEFAULT_SCALE
 	hand.append(card_scene)
 	deal_to_hand(card_scene) # don't have to await this as stagger will be set per card anyways
 	if deck.size() == 0:
 		deck_reference.get_node("card_back").visible = false
 		
-func instantiate_card(card_data : CardData, start_pos : Vector2, scale : Vector2) -> Card:
+func instantiate_card(card_data : CardData) -> Card:
 	var card_scene: Card = load("res://prefabs/card.tscn").instantiate()
-	card_scene.scale = scale
-	card_scene.position = start_pos
 	card_scene.data = card_data
 	return card_scene
 		
 func discard_card(card : Card) -> void:
 	discard.append(card.data)
-	var final_pos : Vector2 = Vector2($discard.position.x - hand_reference.position.x, 0) # discard offset from the hand position
+	var final_pos : Vector2 = discard_reference.global_position
 	var tween : Tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tween.parallel().tween_property(card, "position", final_pos, .1)
+	tween.parallel().tween_property(card, "global_position", final_pos, .1)
 	tween.parallel().tween_property(card, "rotation", 0, .1)
 	await tween.finished
 	hand.remove_at(card.index_in_hand)
@@ -121,21 +122,22 @@ func move_to_deck(card : Variant) -> void:
 	# TODO: this is untested. create a card that moves something from hand to top of deck
 	if card is Card: # hand, already instantiated
 		deck.insert(0, card.data)
-		var final_pos : Vector2 = Vector2(deck_reference.position.x - hand_reference.position.x, 0) # deck offset from the hand position
+		var final_pos : Vector2 = deck_reference.global_position
 		var tween : Tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-		tween.parallel().tween_property(card, "position", final_pos, .2)
+		tween.parallel().tween_property(card, "global_position", final_pos, .2)
 		tween.parallel().tween_property(card, "rotation", 0, .2)
 		tween.parallel().tween_callback(card.get_node("animation").play.bind("reverse_flip_card"))
 		await tween.finished
 		hand.remove_at(card.index_in_hand)
 		card.queue_free()
 	else: # discard, need to instantiate and then free
-		var card_ref = instantiate_card(card, Vector2(0, 0), Vector2(1, 1))
+		var card_ref = instantiate_card(card)
 		discard_reference.add_child(card_ref)
+		card_ref.global_position = discard_reference.global_position
 		deck.insert(0, card)
-		var final_pos : Vector2 = Vector2((deck_reference.position.x - discard_reference.position.x) * 3, 0) # deck offset from the discard position. multiply by 3 because scaled down by 3
+		var final_pos : Vector2 = deck_reference.global_position
 		var tween : Tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-		tween.parallel().tween_property(card_ref, "position", final_pos, .2)
+		tween.parallel().tween_property(card_ref, "global_position", final_pos, .2)
 		tween.parallel().tween_callback(card_ref.get_node("animation").play.bind("reverse_flip_card"))
 		await tween.finished
 		card_ref.queue_free()
@@ -156,11 +158,11 @@ func deal_to_hand(new_card : Card = null) -> void:
 		var hand_ratio: float = 0.5
 		if hand.size() > 1:
 			hand_ratio = float(i.index_in_hand) / (float(hand.size()) - 1.0)
-			final_pos = Vector2(hand_ratio * offset, 0)
+			final_pos = hand_reference.to_global(Vector2(hand_ratio * offset, 0))
 			final_rot = lerp_angle(-0.2, 0.2, float(i.index_in_hand)/float(hand.size() - 1))
 		else:
 			final_rot = 0
-			final_pos = Vector2(max_offset / 2.0, 0)
+			final_pos = hand_reference.to_global(Vector2(max_offset / 2.0, 0))
 		
 		i.in_hand_pos = final_pos
 		i.in_hand_rot = final_rot
@@ -173,7 +175,7 @@ func deal_to_hand(new_card : Card = null) -> void:
 		# play the flip card animation only if this is a new card
 		if i == new_card:
 			tween.parallel().tween_callback(i.get_node("animation").play.bind("flip_card")).set_delay(card_delay)
-		tween.parallel().tween_property(i, "position", final_pos, 0.25).set_delay(card_delay)
+		tween.parallel().tween_property(i, "global_position", final_pos, 0.25).set_delay(card_delay)
 		tween.parallel().tween_property(i, "rotation", final_rot, 0.35).set_delay(card_delay)
 		final_tween = tween
 		
