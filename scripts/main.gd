@@ -66,10 +66,8 @@ func build_deck() -> void:
 func draw_card() -> void:
 	if deck.size() == 0:
 		# small pause before playing shuffle animation
-		await get_tree().create_timer(.5).timeout
-		await shuffle_discard_into_deck()
-		# small pause before next draw animation
 		await get_tree().create_timer(.15).timeout
+		await shuffle_discard_into_deck()
 		
 	var card_data : CardData = deck.pop_back()
 	var start_pos : Vector2 = deck_reference.global_position
@@ -79,7 +77,7 @@ func draw_card() -> void:
 	card_scene.global_position = start_pos
 	card_scene.scale = CARD_DEFAULT_SCALE
 	hand.append(card_scene)
-	deal_to_hand(card_scene) # don't have to await this as stagger will be set per card anyways
+	await deal_to_hand(card_scene) # don't have to await this as stagger will be set per card anyways
 	if deck.size() == 0:
 		deck_reference.get_node("card_back").visible = false
 		
@@ -150,9 +148,6 @@ func deal_to_hand(new_card : Card = null) -> void:
 	var final_pos: Vector2
 	var final_rot: float
 	
-	# This dictates how long to wait between each card's movement (in seconds)
-	var stagger_delay: float = 0.15 
-	
 	var final_tween : Tween
 	for i in hand:
 		var hand_ratio: float = 0.5
@@ -167,16 +162,13 @@ func deal_to_hand(new_card : Card = null) -> void:
 		i.in_hand_pos = final_pos
 		i.in_hand_rot = final_rot
 		
-		# calculate the delay
-		var card_delay : float = i.index_in_hand * stagger_delay
-		
 		# apply delay to the tweens
 		var tween : Tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 		# play the flip card animation only if this is a new card
 		if i == new_card:
-			tween.parallel().tween_callback(i.get_node("animation").play.bind("flip_card")).set_delay(card_delay)
-		tween.parallel().tween_property(i, "global_position", final_pos, 0.25).set_delay(card_delay)
-		tween.parallel().tween_property(i, "rotation", final_rot, 0.35).set_delay(card_delay)
+			tween.parallel().tween_callback(i.get_node("animation").play.bind("flip_card"))
+		tween.parallel().tween_property(i, "global_position", final_pos, 0.15)
+		tween.parallel().tween_property(i, "rotation", final_rot, 0.15)
 		final_tween = tween
 		
 	await final_tween.finished
