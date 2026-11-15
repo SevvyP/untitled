@@ -85,9 +85,9 @@ func draw_card() -> void:
 
 	# shuffle the discard into the deck
 	if game_state.deck.is_empty():
-		# small pause before playing shuffle animation
-		await get_tree().create_timer(0.15).timeout
 		await shuffle_discard_into_deck()
+		# small pause before drawing the next card
+		await get_tree().create_timer(0.15).timeout
 
 	var card_instance: CardInstance = game_state.draw_card()
 	assert(card_instance, "draw card did not result in a card being drawn")
@@ -105,12 +105,18 @@ func discard_card(card_instance: CardInstance) -> void:
 
 
 ## Discards every card currently in the hand.[br]
-## Cards are discarded individually, starting with the last card.
 func discard_hand() -> void:
-	while not game_state.hand.is_empty():
-		var card_instance: CardInstance = game_state.hand.back()
-		await discard_card(card_instance)
+	var cards: Array[CardInstance] = game_state.hand.duplicate()
+	cards.reverse()
 
+	for card_instance in cards:
+		game_state.discard_card(card_instance)
+
+	await game_view.animate_discard_hand(cards)
+	game_view.update_discard_visual(game_state.discard)
+	
+	# add a small pause before the next action
+	await get_tree().create_timer(0.15).timeout
 
 ## Shuffles discarded cards into the deck and animates the shuffle.
 func shuffle_discard_into_deck() -> void:

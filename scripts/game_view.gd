@@ -8,6 +8,7 @@ extends Node2D
 
 const HAND_SIZE := 5
 const CARD_DEFAULT_SCALE := Vector2(0.33, 0.33)
+const ANIMATION_Z_INDEX := 100
 
 var card_views: Dictionary[int, Card] = {}
 
@@ -117,14 +118,133 @@ func animate_discard(card_instance: CardInstance) -> void:
 	card_view.queue_free()
 
 
-## Animates every discarded card returning to the deck.[br]
-## The logical discard array is managed separately by GameState.
-func animate_shuffle(cards: Array[CardInstance]) -> void:
-	for card_instance in cards:
-		await animate_card_from_discard_to_deck(card_instance)
-		deck_reference.get_node("card_back").visible = true
+## Animates the entire hand into the discard pile in at most 0.5 seconds.
+func animate_discard_hand(cards: Array[CardInstance]) -> void:
+	if cards.is_empty():
+		return
 
-	discard_top_card_reference.visible = false
+	const MOVE_DURATION := 0.2
+	const TOTAL_DURATION := 0.5
+
+	var stagger: float = 0.0
+	if cards.size() > 1:
+		stagger = (TOTAL_DURATION - MOVE_DURATION) / float(cards.size() - 1)
+
+	var tween: Tween = create_tween().set_parallel(true)
+	tween.set_trans(Tween.TRANS_SINE)
+	tween.set_ease(Tween.EASE_IN_OUT)
+
+	for index in range(cards.size()):
+		var card_instance: CardInstance = cards[index]
+		var card_view: Card = card_views[card_instance.id]
+		var delay: float = index * stagger
+
+		card_view.is_animating = true
+		card_view.is_dragging = false
+
+		tween.tween_property(
+			card_view,
+			"global_position",
+			discard_reference.global_position,
+			MOVE_DURATION
+		).set_delay(delay)
+
+		tween.tween_property(
+			card_view, "rotation", 0.0, MOVE_DURATION
+		).set_delay(delay)
+
+		tween.tween_callback(
+			_finish_hand_discard.bind(card_instance, card_view)
+		).set_delay(delay + MOVE_DURATION)
+
+	await tween.finished
+
+
+## Updates the discard artwork and removes the arriving hand card.
+func _finish_hand_discard(
+	card_instance: CardInstance,
+	card_view: Card
+) -> void:
+	discard_top_card_reference.setup(card_instance.data)
+	discard_top_card_reference.visible = true
+
+	card_views.erase(card_instance.id)
+	card_view.queue_free()
+
+
+## Animates every discarded card returning to the deck.[br]
+func animate_shuffle(cards: Array[CardInstance]) -> void:
+	if cards.is_empty():
+		return
+
+	# the animation length for each indivual card
+	const MOVE_DURATION := 0.2
+	# the length of the total shuffle animation
+	const TOTAL_DURATION := 0.5
+	# cards are staggered so that the total animation will be the set length
+	var stagger: float = 0.0
+	if cards.size() > 1:
+		stagger = (TOTAL_DURATION - MOVE_DURATION) / float(cards.size() - 1)
+
+	var tween: Tween = create_tween().set_parallel(true)
+	tween.set_trans(Tween.TRANS_SINE)
+	tween.set_ease(Tween.EASE_IN_OUT)
+
+	var deck_back: CanvasItem = deck_reference.get_node("card_back")
+
+	for index in range(cards.size()):
+		var card_view: Card = instantiate_card(cards[index])
+		discard_reference.add_child(card_view)
+		card_view.global_position = discard_reference.global_position
+		card_view.is_animating = true
+		
+		# render on top of everything else on the board
+		card_view.z_as_relative = false
+		card_view.z_index = ANIMATION_Z_INDEX
+
+		# Show each temporary card when it departs.
+		card_view.visible = false
+		var delay: float = index * stagger
+
+		var animation: AnimationPlayer = card_view.get_node("animation")
+		var flip_speed: float = (
+			animation.get_animation("reverse_flip_card").length / MOVE_DURATION
+		)
+
+		tween.tween_callback(card_view.show).set_delay(delay)
+		tween.tween_callback(
+			animation.play.bind("reverse_flip_card", 0.0, flip_speed)
+		).set_delay(delay)
+
+		var start_pos: Vector2 = card_view.global_position
+		var end_pos: Vector2 = deck_reference.global_position
+
+		# How far above the straight path the card rises at its midpoint.
+		var arc_height: float = 180
+		var control_pos: Vector2 = (
+			(start_pos + end_pos) * 0.5
+			+ Vector2.UP * arc_height * 2.0
+		)
+
+		tween.tween_method(
+			func(progress: float) -> void:
+				var first: Vector2 = start_pos.lerp(control_pos, progress)
+				var second: Vector2 = control_pos.lerp(end_pos, progress)
+				card_view.global_position = first.lerp(second, progress),
+			0.0,
+			1.0,
+			MOVE_DURATION
+		).set_delay(delay)
+
+		tween.tween_callback(deck_back.show).set_delay(delay + MOVE_DURATION)
+		tween.tween_callback(card_view.queue_free).set_delay(delay + MOVE_DURATION)
+
+	# Keep the discard visible until its last card departs.
+	tween.tween_callback(discard_top_card_reference.hide).set_delay(
+		(cards.size() - 1) * stagger
+	)
+
+	await tween.finished
 
 
 ## Animates a temporary card from the discard pile to the deck.[br]
@@ -154,15 +274,17 @@ func animate_hand_card_to_deck(card_instance: CardInstance) -> void:
 
 	var card_view: Card = card_views[card_instance.id]
 	var final_pos: Vector2 = deck_reference.global_position
+	var animation: AnimationPlayer = card_view.get_node("animation")
+	var flip_speed: float = animation.get_animation("flip_card").length
 
 	card_view.is_animating = true
 	card_view.is_dragging = false
 
 	var tween: Tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 
-	tween.parallel().tween_property(card_view, "global_position", final_pos, 0.2)
-	tween.parallel().tween_property(card_view, "rotation", 0, 0.2)
-	tween.parallel().tween_callback(card_view.get_node("animation").play.bind("reverse_flip_card"))
+	tween.parallel().tween_property(card_view, "global_position", final_pos, flip_speed)
+	tween.parallel().tween_property(card_view, "rotation", 0, flip_speed)
+	tween.parallel().tween_callback(animation.play.bind("reverse_flip_card"))
 
 	await tween.finished
 
