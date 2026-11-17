@@ -12,7 +12,6 @@ const ANIMATION_Z_INDEX := 100
 
 var card_views: Dictionary[int, Card] = {}
 
-
 ## Initializes the pile visuals and disables interaction with the discard top card.
 func _ready() -> void:
 	discard_top_card_reference.visible = false
@@ -37,55 +36,77 @@ func create_hand_card(card_instance: CardInstance) -> Card:
 	card_views[card_instance.id] = card_scene
 	return card_scene
 
+func animate_hand_layout(
+	hand_cards: Array[CardInstance],
+	new_card: CardInstance = null
+) -> void:
+	var layout_cards: Array[CardInstance] = hand_cards.duplicate()
 
-## Animates all cards into their correct hand positions.[br]
-## Existing cards reposition simultaneously with the newly drawn card.
-func animate_hand_layout(hand_cards: Array[CardInstance], new_card: CardInstance = null) -> void:
-	if hand_cards.is_empty():
+	if layout_cards.is_empty():
 		return
 
 	var max_offset: float = 450.0
-	var offset: float = max_offset * (float(hand_cards.size() - 1) / float(HAND_SIZE - 1))
-	var tweens: Array[Tween] = []
+	var offset: float = (
+		max_offset
+		* float(layout_cards.size() - 1)
+		/ float(HAND_SIZE - 1)
+	)
 
-	for index in range(hand_cards.size()):
-		var card_instance: CardInstance = hand_cards[index]
+	var animated_views: Array[Card] = []
+
+	var tween: Tween = create_tween().set_parallel(true)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.set_trans(Tween.TRANS_CUBIC)
+
+	for index in range(layout_cards.size()):
+		var card_instance: CardInstance = layout_cards[index]
+
+		assert(
+			card_views.has(card_instance.id),
+			"Hand contains card %d, but its visual is missing"
+			% card_instance.id
+		)
+
 		var card_view: Card = card_views[card_instance.id]
-
 		var final_pos: Vector2
 		var final_rot: float
 
-		if hand_cards.size() > 1:
-			var hand_ratio: float = float(index) / float(hand_cards.size() - 1)
-
-			final_pos = hand_reference.to_global(Vector2(hand_ratio * offset, 0))
+		if layout_cards.size() > 1:
+			var hand_ratio: float = (
+				float(index) / float(layout_cards.size() - 1)
+			)
+			final_pos = hand_reference.to_global(
+				Vector2(hand_ratio * offset, 0)
+			)
 			final_rot = lerp_angle(-0.2, 0.2, hand_ratio)
 		else:
-			final_pos = hand_reference.to_global(Vector2(max_offset / 2.0, 0))
+			final_pos = hand_reference.to_global(
+				Vector2(max_offset / 2.0, 0)
+			)
 			final_rot = 0.0
 
 		card_view.in_hand_pos = final_pos
 		card_view.in_hand_rot = final_rot
 		card_view.is_animating = true
+		animated_views.append(card_view)
 
-		# apply delay to the tweens
-		var tween: Tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-
-		# play the flip card animation only if this is a new card
 		if card_instance == new_card:
-			tween.parallel().tween_callback(card_view.get_node("animation").play.bind("flip_card"))
+			tween.tween_callback(
+				card_view.get_node("animation").play.bind("flip_card")
+			)
 
-		tween.parallel().tween_property(card_view, "global_position", final_pos, 0.15)
-		tween.parallel().tween_property(card_view, "rotation", final_rot, 0.15)
+		tween.tween_property(
+			card_view, "global_position", final_pos, 0.15
+		)
+		tween.tween_property(
+			card_view, "rotation", final_rot, 0.15
+		)
 
-		tweens.append(tween)
+	await tween.finished
 
-	for tween in tweens:
-		await tween.finished
-
-	for card_instance in hand_cards:
-		var card_view: Card = card_views[card_instance.id]
-		card_view.is_animating = false
+	for card_view in animated_views:
+		if is_instance_valid(card_view):
+			card_view.is_animating = false
 
 
 ## Creates and animates a new card entering the hand.
@@ -192,8 +213,10 @@ func animate_shuffle(cards: Array[CardInstance]) -> void:
 
 	var deck_back: CanvasItem = deck_reference.get_node("card_back")
 
+	var temporary_cards: Array[Card] = []
 	for index in range(cards.size()):
 		var card_view: Card = instantiate_card(cards[index])
+		temporary_cards.append(card_view)
 		discard_reference.add_child(card_view)
 		card_view.global_position = discard_reference.global_position
 		card_view.is_animating = true
@@ -237,7 +260,6 @@ func animate_shuffle(cards: Array[CardInstance]) -> void:
 		).set_delay(delay)
 
 		tween.tween_callback(deck_back.show).set_delay(delay + MOVE_DURATION)
-		tween.tween_callback(card_view.queue_free).set_delay(delay + MOVE_DURATION)
 
 	# Keep the discard visible until its last card departs.
 	tween.tween_callback(discard_top_card_reference.hide).set_delay(
@@ -245,6 +267,8 @@ func animate_shuffle(cards: Array[CardInstance]) -> void:
 	)
 
 	await tween.finished
+	for card_view in temporary_cards:
+		card_view.queue_free()
 
 
 ## Animates a temporary card from the discard pile to the deck.[br]

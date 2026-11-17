@@ -12,6 +12,7 @@ var is_dragging: bool = false
 var is_animating: bool = false
 var in_hand_pos: Vector2
 var in_hand_rot: float
+var appearance_tween : Tween
 
 const CARD_DEFAULT_SCALE := Vector2(0.33, 0.33)
 
@@ -75,23 +76,37 @@ func start_dragging() -> void:
 	z_index = 10
 
 
-## Stops dragging and restores the card's hand position.
+## Releases the card at its current position.
 func stop_dragging() -> void:
-	if not is_dragging:
-		return
-
+	if appearance_tween and appearance_tween.is_valid():
+		appearance_tween.kill()
 	is_dragging = false
-	global_position = in_hand_pos
-	rotation = in_hand_rot
 	z_index = 0
+	scale = CARD_DEFAULT_SCALE
+	
+## Returns a released card to its hand position.
+func return_to_hand() -> void:
+	is_animating = true
 
-	await tween_anim(1)
+	var tween: Tween = create_tween().set_parallel(true)
+	tween.set_trans(Tween.TRANS_CUBIC)
+	tween.set_ease(Tween.EASE_OUT)
+
+	tween.tween_property(self, "global_position", in_hand_pos, 0.15)
+	tween.tween_property(self, "rotation", in_hand_rot, 0.15)
+	tween.tween_property(self, "scale", CARD_DEFAULT_SCALE, 0.15)
+
+	await tween.finished
+	is_animating = false
 
 
 ## Plays the card hover or return animation.[br]
 ## Type 0 enlarges the card; type 1 restores its default scale.
 func tween_anim(type: int) -> void:
+	if appearance_tween and appearance_tween.is_valid():
+		appearance_tween.kill()
 	var tween: Tween = create_tween()
+	appearance_tween = tween
 
 	match type:
 		0: # picked up animation

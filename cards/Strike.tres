@@ -6,4 +6,7 @@
 [resource]
 script = ExtResource("1_ewkst")
 art = ExtResource("1_why84")
+card_effects = Dictionary[int, int]({
+0: 6
+})
 metadata/_custom_type_script = "uid://yegwd4iidb46"

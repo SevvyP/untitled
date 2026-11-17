@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://cyumsiykwrd6x"]
+
+[ext_resource type="Texture2D" uid="uid://20vm4rdnto5j" path="res://sprites/draw.png" id="1_eb5rf"]
+[ext_resource type="Script" uid="uid://yegwd4iidb46" path="res://scripts/card_data.gd" id="1_pvn7b"]
+
+[resource]
+script = ExtResource("1_pvn7b")
+card_name = "Draw"
+description = "Draw 2 cards"
+art = ExtResource("1_eb5rf")
+card_effects = Dictionary[int, int]({
+2: 2
+})
+metadata/_custom_type_script = "uid://yegwd4iidb46"

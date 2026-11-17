@@ -5,6 +5,9 @@ var deck: Array[CardInstance] = []
 var hand: Array[CardInstance] = []
 var discard: Array[CardInstance] = []
 
+@export var player_health : int = 0
+@export var player_mana : int = 0
+@export var player_gold : int = 0
 
 ## Builds and shuffles the starting deck from CardData resources.
 func build_deck(starting_cards: Array[CardData]) -> void:
