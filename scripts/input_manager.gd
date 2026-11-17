@@ -1,8 +1,13 @@
 extends Node2D
 
+@onready var play_box : Area2D = $"../play_box"
+
 const COLLISION_MASK_CARD: int = 1
+const COLLISION_MASK_PLAY_BOX: int = 2
 
 var dragged_card: Card = null
+
+signal card_play_requested(carde : Card)
 
 
 ## Handles mouse presses and releases for dragging cards.
@@ -23,8 +28,17 @@ func _input(event: InputEvent) -> void:
 			if not dragged_card:
 				return
 
-			dragged_card.stop_dragging()
+			var released_card: Card = dragged_card
 			dragged_card = null
+			released_card.stop_dragging()
+			released_card.is_animating = true
+
+			# if released within the play_box
+			if is_over_play_box(get_global_mouse_position()):
+				card_play_requested.emit(released_card)
+			
+			else:
+				await released_card.return_to_hand()
 
 
 ## Returns the topmost interactive card at the given global position.[br]
@@ -69,3 +83,23 @@ func get_top_card_at_position(global_click_pos: Vector2) -> Card:
 			highest_card = card
 
 	return highest_card
+	
+	
+## checks if the playbox is at the curser
+func is_over_play_box(global_click_pos: Vector2) -> bool:
+	var space_state := get_world_2d().direct_space_state
+
+	# Set up a physics point query at the mouse position
+	var query := PhysicsPointQueryParameters2D.new()
+	query.position = global_click_pos
+	query.collision_mask = COLLISION_MASK_PLAY_BOX
+	query.collide_with_areas = true
+	query.collide_with_bodies = false # Ignore player/walls, only look for card Areas
+
+	# Intersect point returns an array of dictionaries representing all overlapping areas
+	var results := space_state.intersect_point(query)
+
+	if results.is_empty():
+		return false
+
+	return true

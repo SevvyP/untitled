@@ -2,6 +2,7 @@ extends Node2D
 
 @onready var game_view: GameView = $game_view
 @onready var end_turn_reference: Button = $end_turn
+@onready var input_manager = $input_manager
 
 @export var starting_deck: Array[CardData] = []
 
@@ -12,20 +13,24 @@ const HAND_SIZE := 5
 ## true when the game state is updating and player interactions should be paused
 var is_game_state_updating: bool = false
 
-
 ## Initializes the game state, builds the starting deck, and draws the first hand
 func _ready() -> void:
 	game_state = GameState.new()
+	
+	input_manager.card_play_requested.connect(_on_card_play_requested)
 
 	# hacky way to prevent issues with the fiest card dealt
 	await get_tree().create_timer(0.15).timeout
 
 	# TODO: build and assign starting deck instead of placeholder
-	var Strike: CardData = load("res://cards/Strike.tres")
-	var Defend: CardData = load("res://cards/Defend.tres")
+	var Strike: CardData = load("res://cards/strike.tres")
+	var Defend: CardData = load("res://cards/defend.tres")
+	var Draw: CardData = load("res://cards/draw.tres")
 	for i in range(13):
-		if i % 2 == 0:
+		if i % 3 == 0:
 			starting_deck.append(Strike)
+		elif i % 2 == 0:
+			starting_deck.append(Draw)
 		else:
 			starting_deck.append(Defend)
 
@@ -73,6 +78,54 @@ func _on_button_pressed() -> void:
 	# start new turn
 	is_game_state_updating = false
 	end_turn_reference.disabled = false
+
+## Signal recieved from input manager to attempt to play a card
+func _on_card_play_requested(card: Card) -> void:
+	var card_instance: CardInstance = card.card_instance
+	if is_game_state_updating or card_instance == null or not game_state.hand.has(card_instance):
+		await card.return_to_hand()
+		return
+		
+	is_game_state_updating = true
+	
+	card.z_index = GameView.ANIMATION_Z_INDEX
+
+	# Keep the logical instance: discard frees the visual Card node.
+	await discard_card(card_instance)
+	await resolve_card_effects(card_instance)
+	await game_view.animate_hand_layout(game_state.hand)
+	
+	is_game_state_updating = false
+
+
+## Resolve the effects of a card
+func resolve_card_effects(card_instance: CardInstance) -> void:
+	for action in card_instance.data.card_effects:
+		var base_modifier: int = card_instance.data.card_effects[action]
+		var amount: int = base_modifier + get_effect_bonus(action)
+
+		match action:
+			CardData.Effect.ATTACK:
+				# Replace with damage application once targets exist.
+				print("Deal %d damage" % amount)
+
+			CardData.Effect.DEFEND:
+				# Replace with adding block to the player.
+				print("Gain %d block" % amount)
+
+			CardData.Effect.DRAW:
+				for i in range(maxi(amount, 0)):
+					await draw_card()
+
+			CardData.Effect.INFLICT_VULNERABLE:
+				# Replace with adding stacks to the target.
+				print("Apply %d vulnerable" % amount)
+
+
+## TODO: get bonus mondifiers to apply
+func get_effect_bonus(action: CardData.Effect) -> int:
+	# Look up relevant player buffs, relics, etc. here.
+	return 0
 
 
 ## Draws one logical card and animates it entering the hand.[br]
