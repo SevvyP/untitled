@@ -12,7 +12,6 @@ const HAND_SIZE := 5
 ## true when the game state is updating and player interactions should be paused
 var is_game_state_updating: bool = false
 
-
 ## Initializes the game state, builds the starting deck, and draws the first hand
 func _ready() -> void:
 	game_state = GameState.new()
@@ -21,9 +20,16 @@ func _ready() -> void:
 	await get_tree().create_timer(0.15).timeout
 
 	# TODO: build and assign starting deck instead of placeholder
-	var Strike: CardData = load("res://cards/Strike.tres")
-	var Defend: CardData = load("res://cards/Defend.tres")
+	var Strike: CardData = load("res://cards/strike.tres")
+	var Defend: CardData = load("res://cards/defend.tres")
+	var Draw: CardData = load("res://cards/draw.tres")
+	# TODO: save all card functions as scripts and load them
+	Strike.play_card = func(): print("strike!")
+	Defend.play_card = func(): print("defend!")
+	Draw.play_card = func() : await draw_card(); await draw_card()
 	for i in range(13):
+		if i % 3 == 0:
+			starting_deck.append(Draw)
 		if i % 2 == 0:
 			starting_deck.append(Strike)
 		else:
@@ -149,3 +155,15 @@ func move_to_deck(card_instance: CardInstance) -> void:
 
 	game_view.update_deck_visual(game_state.deck.size())
 	game_view.update_discard_visual(game_state.discard)
+
+## Play a card and then discard it
+func _on_input_manager_request_play_card(card: Card) -> void:
+	# card play animation
+	await game_view.animate_card_play(card)
+	
+	# easier visually to discard first but need to save a reference
+	var temp_card_data := card.data
+	await discard_card(card.card_instance)
+	
+	await temp_card_data.play_card.call()
+	await game_view.animate_hand_layout(game_state.hand)

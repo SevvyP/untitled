@@ -1,9 +1,13 @@
 extends Node2D
 
 const COLLISION_MASK_CARD: int = 1
+const COLLISION_MASK_PLAY_BOX: int = 2
+
+@onready var play_box : CollisionShape2D = $"../play_box/CollisionShape2D"
 
 var dragged_card: Card = null
 
+signal request_play_card(card : Card)
 
 ## Handles mouse presses and releases for dragging cards.
 func _input(event: InputEvent) -> void:
@@ -23,8 +27,24 @@ func _input(event: InputEvent) -> void:
 			if not dragged_card:
 				return
 
-			dragged_card.stop_dragging()
-			dragged_card = null
+			if is_dragged_card_in_play_box():
+				request_play_card.emit(dragged_card)
+			else:
+				dragged_card.stop_dragging()
+				dragged_card = null
+
+
+## Returns whether the dragged card is fully within the play box
+func is_dragged_card_in_play_box() -> bool:
+	var card_area_collision_shape : CollisionShape2D = dragged_card.get_node("Area2D").get_node("CollisionShape2D")
+	var outer_rect := play_box.shape.get_rect()
+	var inner_rect := card_area_collision_shape.shape.get_rect()
+	
+	# apply transform
+	outer_rect = (play_box.global_transform * outer_rect).abs()
+	inner_rect = (card_area_collision_shape.global_transform * inner_rect).abs()
+	
+	return outer_rect.encloses(inner_rect)
 
 
 ## Returns the topmost interactive card at the given global position.[br]
