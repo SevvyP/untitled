@@ -3,12 +3,12 @@ extends Node2D
 @onready var game_view: GameView = $game_view
 @onready var end_turn_reference: Button = $end_turn
 @onready var input_manager = $input_manager
-@onready var enemy_health_reference : Label = $enemy_health
-@onready var enemy_vulnerable_reference: Label = $enemy_vulnerable
+@onready var enemy_reference : Enemy = $enemy
+@onready var character_reference : Character = $character
 
-@export var enemy_health : int = 30
-@export var enemy_vulnerable : int = 0
 @export var starting_deck: Array[CardData] = []
+var enemy : EnemyInstance
+var character : CharacterInstance
 
 var game_state: GameState
 
@@ -17,14 +17,14 @@ const HAND_SIZE := 5
 ## true when the game state is updating and player interactions should be paused
 var is_game_state_updating: bool = false
 
-# Update display numbers from game state
-func _process(delta: float) -> void:
-	enemy_health_reference.text = str(enemy_health)
-	enemy_vulnerable_reference.text = str(enemy_vulnerable)
-
 ## Initializes the game state, builds the starting deck, and draws the first hand
 func _ready() -> void:
 	game_state = GameState.new()
+	enemy = EnemyInstance.new(load("res://enemies/bigbad1.tres"))
+	enemy_reference.setup(enemy)
+	
+	character = CharacterInstance.new(load("res://characters/untitled.tres"))
+	character_reference.setup(character)
 	
 	input_manager.card_play_requested.connect(_on_card_play_requested)
 
@@ -80,8 +80,8 @@ func _on_button_pressed() -> void:
 	await discard_hand()
 
 	# trigger enemy turns
-	if enemy_vulnerable > 0:
-		enemy_vulnerable -= 1
+	# TODO: pass in any targets if more than just player
+	enemy.execute_next_turn([character])
 
 	# resolve start of next player turn
 
@@ -117,36 +117,9 @@ func _on_card_play_requested(card: Card) -> void:
 
 ## Resolve the effects of a card
 func resolve_card_effects(card_instance: CardInstance) -> void:
-	for action in card_instance.data.card_effects:
-		var base_modifier: int = card_instance.data.card_effects[action]
-		var amount: int = base_modifier + get_effect_bonus(action)
-
-		match action:
-			CardData.Effect.ATTACK:
-				enemy_health -= amount
-				if enemy_health <= 0:
-					enemy_health = 0
-					print("game over!")
-
-			CardData.Effect.DEFEND:
-				# Replace with adding block to the player.
-				print("Gain %d block" % amount)
-
-			CardData.Effect.DRAW:
-				for i in range(maxi(amount, 0)):
-					await draw_card()
-
-			CardData.Effect.INFLICT_VULNERABLE:
-				enemy_vulnerable += amount
-
-
-## TODO: get bonus mondifiers to apply
-func get_effect_bonus(action: CardData.Effect) -> int:
-	# Look up relevant player buffs, relics, etc. here.
-	if action == CardData.Effect.ATTACK:
-		return enemy_vulnerable
-	return 0
-
+	# TODO: player pick a target
+	for action in card_instance.data.ability.actions:
+		action.execute(enemy)
 
 ## Draws one logical card and animates it entering the hand.[br]
 ## Shuffles the discard pile into the deck when necessary.

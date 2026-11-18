@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://bthp45cu2wvg8"]
+
+[node name="enemy" type="Node2D" unique_id=303445504]
+
+[node name="RichTextLabel3" type="Label" parent="." unique_id=2037874735]
+offset_left = -72.0
+offset_top = -40.0
+offset_right = 80.0
+text = "Health: "
+
+[node name="health" type="Label" parent="." unique_id=343033482]
+offset_left = 32.0
+offset_top = -40.0
+offset_right = 96.0
+text = "0"
+
+[node name="RichTextLabel4" type="Label" parent="." unique_id=649426387]
+offset_left = -72.0
+offset_right = 80.0
+offset_bottom = 40.0
+text = "Vulnerable:"
+
+[node name="vulnerable" type="Label" parent="." unique_id=1569152476]
+offset_left = 32.0
+offset_right = 96.0
+offset_bottom = 40.0
+text = "0"

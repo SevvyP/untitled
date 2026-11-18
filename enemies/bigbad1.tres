@@ -1,0 +1,55 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://3sbeljyu0uy5"]
+
+[ext_resource type="Script" uid="uid://bpi6qpqgcuu7o" path="res://scripts/ability.gd" id="1_b0bi1"]
+[ext_resource type="Script" uid="uid://1b1b2s3113ef" path="res://scripts/enemy_data.gd" id="2_chp45"]
+[ext_resource type="Script" uid="uid://b8j2sh1fyayd1" path="res://scripts/action.gd" id="2_tnugs"]
+
+[sub_resource type="Resource" id="Resource_aycb7"]
+script = ExtResource("2_tnugs")
+modifier = 10
+metadata/_custom_type_script = "uid://b8j2sh1fyayd1"
+
+[sub_resource type="Resource" id="Resource_hhiix"]
+script = ExtResource("2_tnugs")
+effect = 1
+modifier = 6
+metadata/_custom_type_script = "uid://b8j2sh1fyayd1"
+
+[sub_resource type="Resource" id="Resource_tnugs"]
+script = ExtResource("1_b0bi1")
+actions = Array[ExtResource("2_tnugs")]([SubResource("Resource_aycb7"), SubResource("Resource_hhiix")])
+metadata/_custom_type_script = "uid://bpi6qpqgcuu7o"
+
+[sub_resource type="Resource" id="Resource_frc1r"]
+script = ExtResource("2_tnugs")
+effect = 5
+modifier = 2
+metadata/_custom_type_script = "uid://b8j2sh1fyayd1"
+
+[sub_resource type="Resource" id="Resource_b36t5"]
+script = ExtResource("2_tnugs")
+effect = 1
+modifier = 20
+metadata/_custom_type_script = "uid://b8j2sh1fyayd1"
+
+[sub_resource type="Resource" id="Resource_dl4bj"]
+script = ExtResource("1_b0bi1")
+actions = Array[ExtResource("2_tnugs")]([SubResource("Resource_frc1r"), SubResource("Resource_b36t5")])
+metadata/_custom_type_script = "uid://bpi6qpqgcuu7o"
+
+[sub_resource type="Resource" id="Resource_l78j8"]
+script = ExtResource("2_tnugs")
+modifier = 15
+metadata/_custom_type_script = "uid://b8j2sh1fyayd1"
+
+[sub_resource type="Resource" id="Resource_k5fic"]
+script = ExtResource("1_b0bi1")
+actions = Array[ExtResource("2_tnugs")]([SubResource("Resource_l78j8")])
+metadata/_custom_type_script = "uid://bpi6qpqgcuu7o"
+
+[resource]
+script = ExtResource("2_chp45")
+abilities = Array[ExtResource("1_b0bi1")]([SubResource("Resource_tnugs"), SubResource("Resource_dl4bj"), SubResource("Resource_k5fic")])
+name = "Big Bad 1"
+health = 45
+metadata/_custom_type_script = "uid://1b1b2s3113ef"

@@ -2,4 +2,4 @@
 class_name EnemyData
 extends CharacterData
 
-@export var turns : Array[EnemyTurn] = []
+@export var abilities : Array[Ability] = []

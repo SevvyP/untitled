@@ -1,16 +1,18 @@
 ## The visual layer of a character
+class_name Character
 extends Node2D
 
-@export var data: CharacterData
-
+@onready var health = $health
+@onready var mana = $mana
 # the logical state of the character
-var character_instance: CharacterInstance
+var character: CharacterInstance
 
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+func _process(_delta: float) -> void:
+	health.text = str(character.health)
+	
+func setup(character_instance : CharacterInstance) -> void:
+	if not character_instance:
+		return
+		
+	character = character_instance
+	

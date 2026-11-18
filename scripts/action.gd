@@ -23,7 +23,7 @@ enum Effect {
 func execute(target : CharacterInstance = null) -> void:
 	if effect == Effect.ATTACK:
 		assert(target, "no target for an attack action")
-		target.health -= modifier
+		target.health -= modifier + target.vulnerable
 	if effect == Effect.DEFEND:
 		print("Block " + str(modifier) + " damage")
 	if effect == Effect.DRAW:

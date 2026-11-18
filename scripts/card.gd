@@ -7,8 +7,6 @@ extends Node2D
 @onready var card_name: Label = $Area2D/name
 @onready var description: Label = $Area2D/description
 
-@export var data: CardData
-
 # the logical state of the card
 var card_instance: CardInstance
 
@@ -24,8 +22,6 @@ const CARD_DEFAULT_SCALE := Vector2(0.33, 0.33)
 func _ready() -> void:
 	if card_instance:
 		setup(card_instance.data)
-	elif data:
-		setup(data)
 
 
 ## Updates the card position and rotation while dragging.
@@ -55,22 +51,20 @@ func _on_area_2d_mouse_exited() -> void:
 
 ## Assigns the card definition and updates its artwork.
 func setup(card_data: CardData) -> void:
-	data = card_data
-
 	if not is_node_ready():
 		return
 
-	if data and data.art:
-		art.texture = data.art
+	if card_data and card_data.art:
+		art.texture = card_data.art
 		
-	if data and data.card_name:
-		card_name.text = data.card_name
+	if card_data and card_data.card_name:
+		card_name.text = card_data.card_name
 		
-	if data and data.cost:
-		cost.text = str(data.cost)
+	if card_data and card_data.cost:
+		cost.text = str(card_data.cost)
 		
-	if data and data.description:
-		description.text = data.description
+	if card_data and card_data.description:
+		description.text = card_data.description
 
 
 ## Associates the visual card with its logical CardInstance.
