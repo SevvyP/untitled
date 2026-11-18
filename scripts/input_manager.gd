@@ -1,7 +1,6 @@
 extends Node2D
 
-@onready var play_box : Area2D = $"../play_box"
-
+@onready var play_box : CollisionShape2D = $"../play_box/CollisionShape2D"
 const COLLISION_MASK_CARD: int = 1
 const COLLISION_MASK_PLAY_BOX: int = 2
 
@@ -28,17 +27,14 @@ func _input(event: InputEvent) -> void:
 			if not dragged_card:
 				return
 
-			var released_card: Card = dragged_card
-			dragged_card = null
-			released_card.stop_dragging()
-			released_card.is_animating = true
-
 			# if released within the play_box
-			if is_over_play_box(get_global_mouse_position()):
-				card_play_requested.emit(released_card)
+			if is_dragged_card_in_play_box():
+				card_play_requested.emit(dragged_card)
 			
 			else:
-				await released_card.return_to_hand()
+				dragged_card.stop_dragging()
+				await dragged_card.return_to_hand()
+				dragged_card = null
 
 
 ## Returns the topmost interactive card at the given global position.[br]
@@ -85,21 +81,14 @@ func get_top_card_at_position(global_click_pos: Vector2) -> Card:
 	return highest_card
 	
 	
-## checks if the playbox is at the curser
-func is_over_play_box(global_click_pos: Vector2) -> bool:
-	var space_state := get_world_2d().direct_space_state
+## Returns whether the dragged card is fully within the play box
+func is_dragged_card_in_play_box() -> bool:
+	var card_area_collision_shape : CollisionShape2D = dragged_card.get_node("Area2D").get_node("CollisionShape2D")
+	var outer_rect := play_box.shape.get_rect()
+	var inner_rect := card_area_collision_shape.shape.get_rect()
 
-	# Set up a physics point query at the mouse position
-	var query := PhysicsPointQueryParameters2D.new()
-	query.position = global_click_pos
-	query.collision_mask = COLLISION_MASK_PLAY_BOX
-	query.collide_with_areas = true
-	query.collide_with_bodies = false # Ignore player/walls, only look for card Areas
+	# apply transform
+	outer_rect = (play_box.global_transform * outer_rect).abs()
+	inner_rect = (card_area_collision_shape.global_transform * inner_rect).abs()
 
-	# Intersect point returns an array of dictionaries representing all overlapping areas
-	var results := space_state.intersect_point(query)
-
-	if results.is_empty():
-		return false
-
-	return true
+	return outer_rect.encloses(inner_rect)

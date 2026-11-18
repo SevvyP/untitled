@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://b7853uqjn56ct" path="res://sprites/card_frame_demo.png" id="2_hyht8"]
 [ext_resource type="Texture2D" uid="uid://uhcinog8m7c5" path="res://sprites/card_back_demo.png" id="4_8m1pn"]
 [ext_resource type="Texture2D" uid="uid://cpb5uwpya5bg8" path="res://sprites/strike.png" id="4_hdhns"]
+[ext_resource type="Texture2D" uid="uid://booqbd5npgygp" path="res://sprites/card_pile_holder.png" id="5_hdhns"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_31sbn"]
 size = Vector2(512, 768)
@@ -116,6 +117,40 @@ texture = ExtResource("4_hdhns")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1501913736]
 shape = SubResource("RectangleShape2D_31sbn")
+
+[node name="Sprite2D" type="Sprite2D" parent="Area2D" unique_id=214734746]
+position = Vector2(191, -334)
+scale = Vector2(0.15234378, 0.067708276)
+texture = ExtResource("5_hdhns")
+
+[node name="cost" type="Label" parent="Area2D" unique_id=1160663320]
+offset_left = 168.0
+offset_top = -360.0
+offset_right = 216.0
+offset_bottom = -312.0
+theme_override_font_sizes/font_size = 32
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="name" type="Label" parent="Area2D" unique_id=1146259975]
+offset_left = -216.0
+offset_top = -360.0
+offset_right = 136.0
+offset_bottom = -312.0
+theme_override_font_sizes/font_size = 32
+text = "Strike"
+vertical_alignment = 1
+
+[node name="description" type="Label" parent="Area2D" unique_id=1301708615]
+offset_left = -216.0
+offset_top = 152.0
+offset_right = 208.0
+offset_bottom = 344.0
+theme_override_font_sizes/font_size = 32
+text = "Deal 6 damage"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="animation" type="AnimationPlayer" parent="." unique_id=2111350441]
 libraries/ = SubResource("AnimationLibrary_fsik0")

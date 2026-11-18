@@ -3,7 +3,11 @@ extends Node2D
 @onready var game_view: GameView = $game_view
 @onready var end_turn_reference: Button = $end_turn
 @onready var input_manager = $input_manager
+@onready var enemy_health_reference : Label = $enemy_health
+@onready var enemy_vulnerable_reference: Label = $enemy_vulnerable
 
+@export var enemy_health : int = 30
+@export var enemy_vulnerable : int = 0
 @export var starting_deck: Array[CardData] = []
 
 var game_state: GameState
@@ -12,6 +16,11 @@ const HAND_SIZE := 5
 
 ## true when the game state is updating and player interactions should be paused
 var is_game_state_updating: bool = false
+
+# Update display numbers from game state
+func _process(delta: float) -> void:
+	enemy_health_reference.text = str(enemy_health)
+	enemy_vulnerable_reference.text = str(enemy_vulnerable)
 
 ## Initializes the game state, builds the starting deck, and draws the first hand
 func _ready() -> void:
@@ -23,10 +32,13 @@ func _ready() -> void:
 	await get_tree().create_timer(0.15).timeout
 
 	# TODO: build and assign starting deck instead of placeholder
-	var Strike: CardData = load("res://cards/strike.tres")
+	var Strike: CardData = load("res://cards/srike.tres")
 	var Defend: CardData = load("res://cards/defend.tres")
 	var Draw: CardData = load("res://cards/draw.tres")
-	for i in range(13):
+	var Vulnerable: CardData = load("res://cards/vulnerable.tres")
+	for i in range(10):
+		if i % 4 == 0:
+			starting_deck.append(Vulnerable)
 		if i % 3 == 0:
 			starting_deck.append(Strike)
 		elif i % 2 == 0:
@@ -68,6 +80,8 @@ func _on_button_pressed() -> void:
 	await discard_hand()
 
 	# trigger enemy turns
+	if enemy_vulnerable > 0:
+		enemy_vulnerable -= 1
 
 	# resolve start of next player turn
 
@@ -90,9 +104,12 @@ func _on_card_play_requested(card: Card) -> void:
 	
 	card.z_index = GameView.ANIMATION_Z_INDEX
 
-	# Keep the logical instance: discard frees the visual Card node.
-	await discard_card(card_instance)
+	await game_view.animate_card_play(card)
+
+	await discard_card(card.card_instance)
+	
 	await resolve_card_effects(card_instance)
+	
 	await game_view.animate_hand_layout(game_state.hand)
 	
 	is_game_state_updating = false
@@ -106,8 +123,10 @@ func resolve_card_effects(card_instance: CardInstance) -> void:
 
 		match action:
 			CardData.Effect.ATTACK:
-				# Replace with damage application once targets exist.
-				print("Deal %d damage" % amount)
+				enemy_health -= amount
+				if enemy_health <= 0:
+					enemy_health = 0
+					print("game over!")
 
 			CardData.Effect.DEFEND:
 				# Replace with adding block to the player.
@@ -118,13 +137,14 @@ func resolve_card_effects(card_instance: CardInstance) -> void:
 					await draw_card()
 
 			CardData.Effect.INFLICT_VULNERABLE:
-				# Replace with adding stacks to the target.
-				print("Apply %d vulnerable" % amount)
+				enemy_vulnerable += amount
 
 
 ## TODO: get bonus mondifiers to apply
 func get_effect_bonus(action: CardData.Effect) -> int:
 	# Look up relevant player buffs, relics, etc. here.
+	if action == CardData.Effect.ATTACK:
+		return enemy_vulnerable
 	return 0
 
 

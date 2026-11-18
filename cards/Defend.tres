@@ -6,6 +6,7 @@
 [resource]
 script = ExtResource("2_vp3g3")
 card_name = "Defend"
+description = "Block 6 damage"
 art = ExtResource("1_npllq")
 card_effects = Dictionary[int, int]({
 1: 6

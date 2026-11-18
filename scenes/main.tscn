@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://bad21sxhga4fv" path="res://scripts/input_manager.gd" id="6_tefeu"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyhfs"]
-size = Vector2(768, 384)
+size = Vector2(768, 512)
 
 [node name="battle" type="Node2D" unique_id=759941962]
 script = ExtResource("1_0wfyh")
@@ -24,19 +24,72 @@ text = "End turn"
 script = ExtResource("6_tefeu")
 
 [node name="play_box" type="Area2D" parent="." unique_id=1864854900]
-position = Vector2(80, -192)
+position = Vector2(968, 328)
 collision_layer = 2
 collision_mask = 2
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" type="Sprite2D" parent="play_box" unique_id=632774017]
-position = Vector2(928, 504)
 rotation = 1.5707964
-scale = Vector2(0.75, 1)
 texture = ExtResource("4_jyhfs")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="play_box" unique_id=1803472492]
-position = Vector2(928, 504)
 shape = SubResource("RectangleShape2D_jyhfs")
+
+[node name="RichTextLabel" type="Label" parent="." unique_id=669754216]
+offset_left = 104.0
+offset_top = 552.0
+offset_right = 256.0
+offset_bottom = 592.0
+text = "Health: "
+
+[node name="RichTextLabel2" type="Label" parent="." unique_id=851194320]
+offset_left = 104.0
+offset_top = 584.0
+offset_right = 168.0
+offset_bottom = 624.0
+text = "Mana: "
+
+[node name="mana" type="Label" parent="." unique_id=318705797]
+offset_left = 176.0
+offset_top = 584.0
+offset_right = 240.0
+offset_bottom = 624.0
+text = "0"
+
+[node name="health" type="Label" parent="." unique_id=749095852]
+offset_left = 176.0
+offset_top = 552.0
+offset_right = 240.0
+offset_bottom = 592.0
+text = "0"
+
+[node name="RichTextLabel3" type="Label" parent="." unique_id=1632556896]
+offset_left = 1472.0
+offset_top = 72.0
+offset_right = 1624.0
+offset_bottom = 112.0
+text = "Health: "
+
+[node name="enemy_health" type="Label" parent="." unique_id=2007028371]
+offset_left = 1576.0
+offset_top = 72.0
+offset_right = 1640.0
+offset_bottom = 112.0
+text = "0"
+
+[node name="RichTextLabel4" type="Label" parent="." unique_id=1184581776]
+offset_left = 1472.0
+offset_top = 112.0
+offset_right = 1624.0
+offset_bottom = 152.0
+text = "Vulnerable:"
+
+[node name="enemy_vulnerable" type="Label" parent="." unique_id=154307027]
+offset_left = 1576.0
+offset_top = 112.0
+offset_right = 1640.0
+offset_bottom = 152.0
+text = "0"
 
 [connection signal="pressed" from="end_turn" to="." method="_on_button_pressed"]

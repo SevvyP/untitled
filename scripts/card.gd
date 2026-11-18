@@ -2,6 +2,9 @@ class_name Card
 extends Node2D
 
 @onready var art: Sprite2D = $Area2D/card_art
+@onready var cost: Label = $Area2D/cost
+@onready var card_name: Label = $Area2D/name
+@onready var description: Label = $Area2D/description
 
 @export var data: CardData
 
@@ -12,7 +15,6 @@ var is_dragging: bool = false
 var is_animating: bool = false
 var in_hand_pos: Vector2
 var in_hand_rot: float
-var appearance_tween : Tween
 
 const CARD_DEFAULT_SCALE := Vector2(0.33, 0.33)
 
@@ -59,6 +61,15 @@ func setup(card_data: CardData) -> void:
 
 	if data and data.art:
 		art.texture = data.art
+		
+	if data and data.card_name:
+		card_name.text = data.card_name
+		
+	if data and data.cost:
+		cost.text = str(data.cost)
+		
+	if data and data.description:
+		description.text = data.description
 
 
 ## Associates the visual card with its logical CardInstance.
@@ -78,8 +89,6 @@ func start_dragging() -> void:
 
 ## Releases the card at its current position.
 func stop_dragging() -> void:
-	if appearance_tween and appearance_tween.is_valid():
-		appearance_tween.kill()
 	is_dragging = false
 	z_index = 0
 	scale = CARD_DEFAULT_SCALE
@@ -103,10 +112,7 @@ func return_to_hand() -> void:
 ## Plays the card hover or return animation.[br]
 ## Type 0 enlarges the card; type 1 restores its default scale.
 func tween_anim(type: int) -> void:
-	if appearance_tween and appearance_tween.is_valid():
-		appearance_tween.kill()
 	var tween: Tween = create_tween()
-	appearance_tween = tween
 
 	match type:
 		0: # picked up animation

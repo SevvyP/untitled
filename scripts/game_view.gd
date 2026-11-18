@@ -129,6 +129,8 @@ func animate_discard(card_instance: CardInstance) -> void:
 	var tween: Tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	tween.parallel().tween_property(card_view, "global_position", final_pos, 0.1)
 	tween.parallel().tween_property(card_view, "rotation", 0, 0.1)
+	# if card is not default size
+	tween.parallel().tween_property(card_view, "scale", CARD_DEFAULT_SCALE, 0.1)
 
 	await tween.finished
 
@@ -332,3 +334,9 @@ func update_discard_visual(discard_cards: Array[CardInstance]) -> void:
 
 	discard_top_card_reference.setup(top_card.data)
 	discard_top_card_reference.visible = true
+	
+	
+func animate_card_play(card : Card) -> void:
+	var tween : Tween = get_tree().create_tween()
+	tween.tween_property(card, "scale", Vector2(0.5, 0.5), 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	await tween.finished

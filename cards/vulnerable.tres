@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://cmtmoqt0w1d2h"]
+
+[ext_resource type="Texture2D" uid="uid://c83x1ibgsrx1a" path="res://sprites/vulnerable.png" id="1_g4lfw"]
+[ext_resource type="Script" uid="uid://yegwd4iidb46" path="res://scripts/card_data.gd" id="2_wdlri"]
+
+[resource]
+script = ExtResource("2_wdlri")
+card_name = "Vulnerable"
+description = "Apply 2 vulnerable"
+art = ExtResource("1_g4lfw")
+card_effects = Dictionary[int, int]({
+3: 2
+})
+metadata/_custom_type_script = "uid://yegwd4iidb46"
