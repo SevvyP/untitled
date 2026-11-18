@@ -1,3 +1,4 @@
+## The logical layer of the game
 class_name GameState
 extends RefCounted
 

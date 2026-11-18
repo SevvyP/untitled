@@ -1,3 +1,4 @@
+## The visual layer of a card
 class_name Card
 extends Node2D
 

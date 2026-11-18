@@ -1,3 +1,4 @@
+# The visual layer of the game
 class_name GameView
 extends Node2D
 

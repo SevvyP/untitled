@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://c70kkuypg8xk3"]
+
+[node name="character" type="Node2D" unique_id=1521018000]
+
+[node name="RichTextLabel" type="Label" parent="." unique_id=2020425418]
+offset_left = 104.0
+offset_top = 552.0
+offset_right = 256.0
+offset_bottom = 592.0
+text = "Health: "
+
+[node name="RichTextLabel2" type="Label" parent="." unique_id=1065886554]
+offset_left = 104.0
+offset_top = 584.0
+offset_right = 168.0
+offset_bottom = 624.0
+text = "Mana: "
+
+[node name="mana" type="Label" parent="." unique_id=374661439]
+offset_left = 176.0
+offset_top = 584.0
+offset_right = 240.0
+offset_bottom = 624.0
+text = "0"
+
+[node name="health" type="Label" parent="." unique_id=903134483]
+offset_left = 176.0
+offset_top = 552.0
+offset_right = 240.0
+offset_bottom = 592.0
+text = "0"

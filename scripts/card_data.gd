@@ -1,3 +1,4 @@
+# The data layer of a card
 class_name CardData
 extends Resource
 
