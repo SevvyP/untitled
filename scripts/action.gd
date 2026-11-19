@@ -3,8 +3,9 @@
 class_name Action
 extends Resource
 
-signal action_requests_change_to_game_state
+signal action_requests_change_to_game_state(action : Action)
 
+## The list of possible effects which are mapped to specific execution behaviours
 enum Effect { 
 	ATTACK, 
 	DEFEND, 
@@ -14,6 +15,32 @@ enum Effect {
 	INFLICT_VULNERABLE, 
 	INFLICT_STRENGTH 
 	}
+	
+## The effect target type, which determines what targets can be chosen
+enum EffectTargetType { SELF, CHOSEN_ALLY, CHOSEN_ENEMY, NONE }
+
+## Returns the effect type for a given effect
+func get_effect_type(effect: Effect) -> EffectTargetType:
+	match effect:
+		Effect.ATTACK:
+			return EffectTargetType.CHOSEN_ENEMY
+
+		Effect.DEFEND:
+			return EffectTargetType.CHOSEN_ALLY
+
+		Effect.DRAW, Effect.GAIN_MANA, Effect.GAIN_GOLD:
+			return EffectTargetType.NONE
+
+		Effect.INFLICT_VULNERABLE:
+			return EffectTargetType.CHOSEN_ENEMY
+
+		Effect.INFLICT_STRENGTH:
+			return EffectTargetType.CHOSEN_ALLY
+		
+	# need to return something
+	assert("effect type was undefined")
+	return EffectTargetType.NONE
+	
 
 @export var effect : Effect = Effect.ATTACK
 @export var modifier: int = 1
@@ -21,22 +48,26 @@ enum Effect {
 ## Execute an action on a target. Some actions like DRAW can be executed without a target
 ## TODO: split each action into a separate script extending Action
 func execute(target : CharacterInstance = null) -> void:
-	if effect == Effect.ATTACK:
-		assert(target, "no target for an attack action")
-		target.health -= modifier + target.vulnerable
-	if effect == Effect.DEFEND:
-		print("Block " + str(modifier) + " damage")
-	if effect == Effect.DRAW:
-		action_requests_change_to_game_state.emit()
-	if effect == Effect.GAIN_MANA:
-		action_requests_change_to_game_state.emit(effect)
-	if effect == Effect.GAIN_GOLD:
-		action_requests_change_to_game_state.emit(effect)
-	if effect == Effect.INFLICT_VULNERABLE:
-		assert(target, "no target for an inflict vulnerable action")
-		target.vulnerable += modifier
-		if target.vulnerable < 0 : target.vulnerable = 0
-	if effect == Effect.INFLICT_STRENGTH:
-		assert(target, "no target for an inflict strength action")
-		target.strength += modifier
-		if target.strength < 0 : target.vulnerable = 0
+	match effect:
+		Effect.ATTACK:
+			assert(target, "no target for an attack action")
+			var damage = modifier + target.vulnerable
+			if damage > target.block:
+				target.health -= damage - target.block
+				target.block = 0
+			else:
+				target.block -= damage
+
+		Effect.DEFEND:
+			target.block += modifier
+
+		Effect.DRAW, Effect.GAIN_MANA, Effect.GAIN_GOLD:
+			action_requests_change_to_game_state.emit(self)
+
+		Effect.INFLICT_VULNERABLE:
+			assert(target, "no target for an inflict vulnerable action")
+			target.vulnerable = maxi(0, target.vulnerable + modifier)
+
+		Effect.INFLICT_STRENGTH:
+			assert(target, "no target for an inflict strength action")
+			target.strength = maxi(0, target.strength + modifier)

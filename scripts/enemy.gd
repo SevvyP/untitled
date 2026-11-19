@@ -3,7 +3,8 @@ class_name Enemy
 extends Node2D
 
 @onready var health : Label = $health
-@onready var vulnerable = $vulnerable
+@onready var vulnerable : Label = $vulnerable
+@onready var block : Label = $block
 
 var enemy : EnemyInstance
 
@@ -11,6 +12,7 @@ var enemy : EnemyInstance
 func _process(_delta: float) -> void:
 	health.text = str(enemy.health)
 	vulnerable.text = str(enemy.vulnerable)
+	block.text = str(enemy.block)
 	
 func setup(enemy_instance : EnemyInstance) -> void:
 	if not enemy_instance:

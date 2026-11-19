@@ -11,6 +11,12 @@ func execute_next_turn(targets : Array[CharacterInstance]) -> void:
 	assert(data is EnemyData, "enemy data is not an enemy")
 	assert(not data.abilities.is_empty(), "enemy has no turn data")
 	
+	# reduce statuses
+	self.vulnerable -= 1
+	if self.vulnerable < 0:
+		self.vulnerable = 0
+	self.block = 0
+	
 	var enemy_data : EnemyData = data
 	
 	var ability_actions : Array[Action] = enemy_data.abilities[current_ability].actions
@@ -20,7 +26,10 @@ func execute_next_turn(targets : Array[CharacterInstance]) -> void:
 		#				heal most damaged enemy
 		#				always inflict strength on self
 		assert(targets and targets.size() > 0, "didn't pass any targets to enemy turn")
-		action.execute(targets[0])
+		if action.get_effect_type(action.effect) == action.EffectTargetType.CHOSEN_ENEMY:
+			action.execute(targets[0])
+		else:
+			action.execute(self)
 		
 	# move forward in ability list, circling back if needed	
 	current_ability += 1

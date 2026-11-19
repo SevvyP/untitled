@@ -84,6 +84,10 @@ func _on_button_pressed() -> void:
 	enemy.execute_next_turn([character])
 
 	# resolve start of next player turn
+	character.vulnerable -= 1
+	if character.vulnerable < 0:
+		character.vulnerable = 0
+	character.block = 0
 
 	# draw a new hand
 	for i in range(HAND_SIZE):
@@ -119,7 +123,28 @@ func _on_card_play_requested(card: Card) -> void:
 func resolve_card_effects(card_instance: CardInstance) -> void:
 	# TODO: player pick a target
 	for action in card_instance.data.ability.actions:
-		action.execute(enemy)
+		match action.get_effect_type(action.effect):
+			Action.EffectTargetType.CHOSEN_ENEMY:
+				action.execute(enemy)
+			Action.EffectTargetType.CHOSEN_ALLY:
+				action.execute(character)
+			Action.EffectTargetType.NONE:
+				if not action.action_requests_change_to_game_state.is_connected(_apply_game_state_effect):
+					action.action_requests_change_to_game_state.connect(_apply_game_state_effect)
+				action.execute()
+
+## helper function for actions which effect the game state (ex: draw, gain mana)
+func _apply_game_state_effect(action : Action) -> void:
+	match action.effect:
+		Action.Effect.DRAW:
+			for i in range(action.modifier):
+				await draw_card()
+
+		#Action.Effect.GAIN_MANA:
+			#game_state.mana += amount
+
+		#Action.Effect.GAIN_GOLD:
+			#game_state.gold += amount
 
 ## Draws one logical card and animates it entering the hand.[br]
 ## Shuffles the discard pile into the deck when necessary.

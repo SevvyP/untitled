@@ -13,6 +13,7 @@ var data: CharacterData
 # list of conditions all characters can have
 @export var vulnerable: int
 @export var strength: int
+@export var block : int
 
 ## Creates a unique instance of a card using its shared CardData resource.
 func _init(character: CharacterData) -> void:
