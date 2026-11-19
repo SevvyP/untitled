@@ -3,7 +3,11 @@
 [ext_resource type="Script" uid="uid://pv4jwrwfe5sj" path="res://scripts/main.gd" id="1_0wfyh"]
 [ext_resource type="PackedScene" uid="uid://2by5rxdywvdw" path="res://prefabs/game_view.tscn" id="2_sugp2"]
 [ext_resource type="Texture2D" uid="uid://booqbd5npgygp" path="res://sprites/card_pile_holder.png" id="4_jyhfs"]
+[ext_resource type="PackedScene" uid="uid://c70kkuypg8xk3" path="res://prefabs/character.tscn" id="5_tbgi4"]
+[ext_resource type="Script" uid="uid://chke1q4dekap8" path="res://scripts/character.gd" id="6_o6xl0"]
 [ext_resource type="Script" uid="uid://bad21sxhga4fv" path="res://scripts/input_manager.gd" id="6_tefeu"]
+[ext_resource type="PackedScene" uid="uid://bthp45cu2wvg8" path="res://prefabs/enemy.tscn" id="7_o6xl0"]
+[ext_resource type="Script" uid="uid://5fjs6ajqbyls" path="res://scripts/enemy.gd" id="8_tipki"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyhfs"]
 size = Vector2(768, 512)
@@ -36,60 +40,12 @@ texture = ExtResource("4_jyhfs")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="play_box" unique_id=1803472492]
 shape = SubResource("RectangleShape2D_jyhfs")
 
-[node name="RichTextLabel" type="Label" parent="." unique_id=669754216]
-offset_left = 104.0
-offset_top = 552.0
-offset_right = 256.0
-offset_bottom = 592.0
-text = "Health: "
+[node name="character" parent="." unique_id=1521018000 instance=ExtResource("5_tbgi4")]
+position = Vector2(192, 536)
+script = ExtResource("6_o6xl0")
 
-[node name="RichTextLabel2" type="Label" parent="." unique_id=851194320]
-offset_left = 104.0
-offset_top = 584.0
-offset_right = 168.0
-offset_bottom = 624.0
-text = "Mana: "
-
-[node name="mana" type="Label" parent="." unique_id=318705797]
-offset_left = 176.0
-offset_top = 584.0
-offset_right = 240.0
-offset_bottom = 624.0
-text = "0"
-
-[node name="health" type="Label" parent="." unique_id=749095852]
-offset_left = 176.0
-offset_top = 552.0
-offset_right = 240.0
-offset_bottom = 592.0
-text = "0"
-
-[node name="RichTextLabel3" type="Label" parent="." unique_id=1632556896]
-offset_left = 1472.0
-offset_top = 72.0
-offset_right = 1624.0
-offset_bottom = 112.0
-text = "Health: "
-
-[node name="enemy_health" type="Label" parent="." unique_id=2007028371]
-offset_left = 1576.0
-offset_top = 72.0
-offset_right = 1640.0
-offset_bottom = 112.0
-text = "0"
-
-[node name="RichTextLabel4" type="Label" parent="." unique_id=1184581776]
-offset_left = 1472.0
-offset_top = 112.0
-offset_right = 1624.0
-offset_bottom = 152.0
-text = "Vulnerable:"
-
-[node name="enemy_vulnerable" type="Label" parent="." unique_id=154307027]
-offset_left = 1576.0
-offset_top = 112.0
-offset_right = 1640.0
-offset_bottom = 152.0
-text = "0"
+[node name="enemy" parent="." unique_id=303445504 instance=ExtResource("7_o6xl0")]
+position = Vector2(1592, 168)
+script = ExtResource("8_tipki")
 
 [connection signal="pressed" from="end_turn" to="." method="_on_button_pressed"]

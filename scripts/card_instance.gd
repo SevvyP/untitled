@@ -1,3 +1,4 @@
+## The instantiated logical instance of a card
 class_name CardInstance
 extends RefCounted
 
@@ -6,7 +7,8 @@ static var next_id: int = 0
 var id: int
 var data: CardData
 
-var upgraded: bool = false
+## True if the card has been upgraded
+@export var upgraded: bool = false
 
 ## Creates a unique instance of a card using its shared CardData resource.
 func _init(card_data: CardData) -> void:

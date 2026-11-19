@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://bthp45cu2wvg8"]
+
+[ext_resource type="Texture2D" uid="uid://dkidpqu626lk1" path="res://sprites/bigbad1.png" id="1_6n8dw"]
+
+[node name="enemy" type="Node2D" unique_id=303445504]
+
+[node name="RichTextLabel3" type="Label" parent="." unique_id=2037874735]
+offset_left = 16.0
+offset_top = -72.0
+offset_right = 168.0
+offset_bottom = -32.0
+text = "Health: "
+metadata/_edit_use_anchors_ = true
+
+[node name="health" type="Label" parent="." unique_id=343033482]
+offset_left = 120.0
+offset_top = -72.0
+offset_right = 184.0
+offset_bottom = -32.0
+text = "0"
+metadata/_edit_use_anchors_ = true
+
+[node name="RichTextLabel4" type="Label" parent="." unique_id=649426387]
+offset_left = 16.0
+offset_top = -32.0
+offset_right = 168.0
+offset_bottom = 8.0
+text = "Vulnerable:"
+metadata/_edit_use_anchors_ = true
+
+[node name="vulnerable" type="Label" parent="." unique_id=1569152476]
+offset_left = 120.0
+offset_top = -32.0
+offset_right = 184.0
+offset_bottom = 8.0
+text = "0"
+metadata/_edit_use_anchors_ = true
+
+[node name="RichTextLabel5" type="Label" parent="." unique_id=439775522]
+offset_left = 16.0
+offset_top = 8.0
+offset_right = 168.0
+offset_bottom = 48.0
+text = "Block:"
+metadata/_edit_use_anchors_ = true
+
+[node name="block" type="Label" parent="." unique_id=1847493337]
+offset_left = 120.0
+offset_top = 8.0
+offset_right = 184.0
+offset_bottom = 48.0
+text = "0"
+metadata/_edit_use_anchors_ = true
+
+[node name="Bigbad1" type="Sprite2D" parent="." unique_id=1927971617]
+position = Vector2(-88, -32)
+scale = Vector2(0.33, 0.33)
+texture = ExtResource("1_6n8dw")
