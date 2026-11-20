@@ -1,8 +1,18 @@
 [gd_scene format=3 uid="uid://c70kkuypg8xk3"]
 
 [ext_resource type="Texture2D" uid="uid://dlodwudecjwox" path="res://sprites/untitled.png" id="1_cs6s8"]
+[ext_resource type="Shader" uid="uid://bqwptp8kc0ubh" path="res://shaders/death.gdshader" id="1_xofgc"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_v5mhf"]
+shader = ExtResource("1_xofgc")
+shader_parameter/position = Vector2(0, 0)
+shader_parameter/radius = 0.0
+shader_parameter/borderWidth = 0.02
+shader_parameter/burnMult = 0.135
+shader_parameter/burnColor = Color(0, 0, 0, 1)
 
 [node name="character" type="Node2D" unique_id=1521018000]
+material = SubResource("ShaderMaterial_v5mhf")
 
 [node name="RichTextLabel" type="Label" parent="." unique_id=2020425418]
 offset_left = -104.0
@@ -46,6 +56,7 @@ text = "0"
 metadata/_edit_use_anchors_ = true
 
 [node name="Untitled" type="Sprite2D" parent="." unique_id=1591309245]
+use_parent_material = true
 position = Vector2(112.00002, -40.000004)
 scale = Vector2(0.33, 0.33)
 texture = ExtResource("1_cs6s8")

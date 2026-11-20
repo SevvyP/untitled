@@ -1,8 +1,26 @@
 [gd_scene format=3 uid="uid://bthp45cu2wvg8"]
 
 [ext_resource type="Texture2D" uid="uid://dkidpqu626lk1" path="res://sprites/bigbad1.png" id="1_6n8dw"]
+[ext_resource type="Shader" uid="uid://bqwptp8kc0ubh" path="res://shaders/death.gdshader" id="1_yfjof"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yfjof"]
+shader = ExtResource("1_yfjof")
+shader_parameter/position = Vector2(0, 0)
+shader_parameter/radius = 0.0
+shader_parameter/borderWidth = 0.02
+shader_parameter/burnMult = 0.135
+shader_parameter/burnColor = Color(0, 0, 0, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cypye"]
+shader = ExtResource("1_yfjof")
+shader_parameter/position = Vector2(0, 0)
+shader_parameter/radius = 0.0
+shader_parameter/borderWidth = 0.02
+shader_parameter/burnMult = 0.135
+shader_parameter/burnColor = Color(0, 0, 0, 1)
 
 [node name="enemy" type="Node2D" unique_id=303445504]
+material = SubResource("ShaderMaterial_yfjof")
 
 [node name="RichTextLabel3" type="Label" parent="." unique_id=2037874735]
 offset_left = 16.0
@@ -53,6 +71,8 @@ text = "0"
 metadata/_edit_use_anchors_ = true
 
 [node name="Bigbad1" type="Sprite2D" parent="." unique_id=1927971617]
+material = SubResource("ShaderMaterial_cypye")
+use_parent_material = true
 position = Vector2(-88, -32)
 scale = Vector2(0.33, 0.33)
 texture = ExtResource("1_6n8dw")

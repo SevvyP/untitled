@@ -8,12 +8,21 @@ var id: int
 var data: CharacterData
 
 # list of attributes all characters have
-@export var health : int
+@export var health : int:
+	set(value):
+		var was_alive := health > 0
+		health = maxi(value, 0)
+
+		if was_alive and health == 0:
+			died.emit()
+		
 
 # list of conditions all characters can have
 @export var vulnerable: int
 @export var strength: int
 @export var block : int
+
+signal died
 
 ## Creates a unique instance of a card using its shared CardData resource.
 func _init(character: CharacterData) -> void:

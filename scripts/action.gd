@@ -57,6 +57,9 @@ func execute(target : CharacterInstance = null) -> void:
 				target.block = 0
 			else:
 				target.block -= damage
+				
+			if target.health < 0:
+				target.health = 0
 
 		Effect.DEFEND:
 			target.block += modifier

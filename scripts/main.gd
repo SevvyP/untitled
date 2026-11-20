@@ -26,6 +26,10 @@ func _ready() -> void:
 	character = CharacterInstance.new(load("res://characters/untitled.tres"))
 	character_reference.setup(character)
 	
+	# bind signals
+	enemy.died.connect(_on_enemy_died.bind(enemy))
+	character.died.connect(_on_player_died.bind(character))
+	
 	input_manager.card_play_requested.connect(_on_card_play_requested)
 
 	# hacky way to prevent issues with the fiest card dealt
@@ -220,3 +224,12 @@ func move_to_deck(card_instance: CardInstance) -> void:
 
 	game_view.update_deck_visual(game_state.deck.size())
 	game_view.update_discard_visual(game_state.discard)
+	
+
+func _on_enemy_died(dead_enemy: EnemyInstance) -> void:
+	print("Enemy died: ", dead_enemy)
+	enemy_reference.animate_death()
+
+func _on_player_died(dead_player: CharacterInstance) -> void:
+	print("Player died: ", dead_player)
+	character_reference.animate_death()
