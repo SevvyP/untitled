@@ -11,30 +11,39 @@ signal card_play_requested(carde : Card)
 
 ## Handles mouse presses and releases for dragging cards.
 func _input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed:
-			if dragged_card:
-				return
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				if dragged_card:
+					return
 
-			var top_card: Card = get_top_card_at_position(get_global_mouse_position())
+				var top_card: Card = get_top_card_at_position(get_global_mouse_position())
 
-			if not top_card or top_card.is_animating:
-				return
+				if not top_card or top_card.is_animating:
+					return
 
-			dragged_card = top_card
-			dragged_card.start_dragging()
-		else:
-			if not dragged_card:
-				return
-
-			# if released within the play_box
-			if is_dragged_card_in_play_box():
-				card_play_requested.emit(dragged_card)
-			
+				dragged_card = top_card
+				dragged_card.start_dragging()
 			else:
-				dragged_card.stop_dragging()
-				await dragged_card.return_to_hand()
-				dragged_card = null
+				if not dragged_card:
+					return
+
+				# if released within the play_box
+				if is_dragged_card_in_play_box():
+					card_play_requested.emit(dragged_card)
+				
+				else:
+					dragged_card.stop_dragging()
+					await dragged_card.return_to_hand()
+					dragged_card = null
+					
+		elif event.button_index == MOUSE_BUTTON_RIGHT:
+			if event.pressed:
+				if dragged_card:
+					dragged_card.stop_dragging()
+					await dragged_card.return_to_hand()
+					dragged_card = null
+				
 
 
 ## Returns the topmost interactive card at the given global position.[br]
