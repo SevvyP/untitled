@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://bdl7xusvr57e5"]
+
+[ext_resource type="Script" uid="uid://pv4jwrwfe5sj" path="res://scripts/battle.gd" id="1_4k1nj"]
+[ext_resource type="PackedScene" uid="uid://2by5rxdywvdw" path="res://prefabs/game_view.tscn" id="2_f4pi3"]
+[ext_resource type="Script" uid="uid://bad21sxhga4fv" path="res://scripts/input_manager.gd" id="3_yahae"]
+[ext_resource type="PackedScene" uid="uid://c70kkuypg8xk3" path="res://prefabs/character.tscn" id="4_v7i3o"]
+[ext_resource type="Script" uid="uid://chke1q4dekap8" path="res://scripts/character.gd" id="5_66ngm"]
+[ext_resource type="PackedScene" uid="uid://bthp45cu2wvg8" path="res://prefabs/enemy.tscn" id="6_03edq"]
+[ext_resource type="Script" uid="uid://5fjs6ajqbyls" path="res://scripts/enemy.gd" id="7_22uqi"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jyhfs"]
+size = Vector2(1920, 640)
+
+[node name="battle" type="Node2D" unique_id=759941962]
+script = ExtResource("1_4k1nj")
+
+[node name="game_view" parent="." unique_id=253964812 instance=ExtResource("2_f4pi3")]
+
+[node name="end_turn" type="Button" parent="." unique_id=1904866195]
+offset_left = 96.0
+offset_top = 640.0
+offset_right = 264.0
+offset_bottom = 703.0
+text = "End turn"
+
+[node name="input_manager" type="Node2D" parent="." unique_id=1147601031]
+script = ExtResource("3_yahae")
+
+[node name="play_box" type="Area2D" parent="." unique_id=1864854900]
+position = Vector2(968, 328)
+collision_layer = 2
+collision_mask = 2
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="play_box" unique_id=1803472492]
+position = Vector2(-8, -8)
+shape = SubResource("RectangleShape2D_jyhfs")
+
+[node name="character" parent="." unique_id=1521018000 instance=ExtResource("4_v7i3o")]
+position = Vector2(192, 536)
+script = ExtResource("5_66ngm")
+
+[node name="enemy" parent="." unique_id=303445504 instance=ExtResource("6_03edq")]
+position = Vector2(1592, 168)
+script = ExtResource("7_22uqi")
+
+[connection signal="pressed" from="end_turn" to="." method="_on_button_pressed"]
