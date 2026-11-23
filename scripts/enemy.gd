@@ -9,18 +9,20 @@ extends Node2D
 
 var enemy : EnemyInstance
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
+## Updates current state of enemy health and statuses
 func _process(_delta: float) -> void:
-	health.text = str(enemy.health)
+	health.text = str(enemy.current_health)
 	vulnerable.text = str(enemy.vulnerable)
 	block.text = str(enemy.block)
 	
+## Sets up an enemy scene from an enemy instance	
 func setup(enemy_instance : EnemyInstance) -> void:
 	if not enemy_instance:
 		return
 	
 	enemy = enemy_instance
 	
+## Animates the death of an enemy	
 func animate_death() -> void:
 	var death_material := material as ShaderMaterial
 	if death_material == null:
@@ -47,6 +49,7 @@ func animate_death() -> void:
 	tween.tween_method(update_radius, 0.0, 2.0, 1.5)
 	await tween.finished
 
+## Helper function for death animation
 func update_radius(value: float):
 	if material:
 		material.set_shader_parameter("radius", value)

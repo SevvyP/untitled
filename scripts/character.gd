@@ -6,14 +6,16 @@ extends Node2D
 @onready var vulnerable : Label = $vulnerable
 @onready var block : Label = $block
 
-# the logical state of the character
+## The logical state of the character
 var character: CharacterInstance
 
+## Updates current state of player health and statuses
 func _process(_delta: float) -> void:
-	health.text = str(character.health)
+	health.text = str(character.current_health)
 	vulnerable.text = str(character.vulnerable)
 	block.text = str(character.block)
 	
+## Sets up a character scene from a character instance	
 func setup(character_instance : CharacterInstance) -> void:
 	if not character_instance:
 		return
@@ -21,6 +23,7 @@ func setup(character_instance : CharacterInstance) -> void:
 	character = character_instance
 	
 	
+## Animates the death of a character
 func animate_death() -> void:
 	var death_material := material as ShaderMaterial
 	if death_material == null:
@@ -47,6 +50,7 @@ func animate_death() -> void:
 	tween.tween_method(update_radius, 0.0, 2.0, 1.5)
 	await tween.finished
 
+## Helper function for character death animation
 func update_radius(value: float):
 	if material:
 		material.set_shader_parameter("radius", value)

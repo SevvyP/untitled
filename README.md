@@ -1,27 +1,30 @@
-
 # Untitled
 
-A framework for card based games
+A Slay the Spire clone
 
 ## Structure
 
-The framework is structured to abstract the logical and physical state of the game as much as possible.
+Resources are separated into logical and visual states.
 
-- `main.gd` - Coordinates player actions, turns, and animations.
-- `game_state.gd` - Manages the logical deck, hand, and discard piles.
-- `game_view.gd` - Handles card instantiation, positioning, and animations.
-- `input_manager.gd` - Handles player input
+- `<type>_data.gd` - Represents a static, saveable resource. Cards, characters, enemies, etc. can be created and saved via these resource declarations
+- `<type>_instance.gd` - Represents an instantiated resource in a run, handling addtional wrapper info like statuses applied during combat
+- `<type>.gd` - Scripts attached to the <type> scene, which handle manipulation and presentation of the <type> visual on the screen
 
-The game state should never interact with the physical scene. The main script enforces rules
-on the player input, applies player input to the game state, and triggers the relevant physical state
-changes
+For the basic gameplay loop, a character and deck are passed into the main scene. 
+The main scene then handles what scenes are displayed, changes to the deck, global state, etc.
 
-## Card System
+## Ability system
 
-- `card_data.gd` - Is the card Resource. New cards can be created by saving an instance of card data
-into the [cards folder](/cards)
-- `card_instance.gd` - Represents an individual card with a unique ID and mutable state.
-- `card.gd` - The card scene which handles interactions with a card and rendering a card from data
+Abilities are represented as an ordered array of actions. Actions are a tuple of Effect and Modifier.
+Every possible action can be represented in this way:
+	
+- `ATTACK: 6` = do 6 damage
+- `DRAW: 2` = draw 2 cards
+- `ADD_MAX_HEALTH: -10` = lose 10 max health
+
+Card abilities, enemy abilities, encounters, etc. can all be represented as a list of actions that are performed. 
+Actions are associated to targeting types, ex.: CHOSEN_ENEMY, SELF, CHOSEN_ALLY, NONE. Players determine
+targets when playing a card, enemies and encounter events need to have targeting behavior defined.
 
 ## Art
 

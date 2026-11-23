@@ -4,6 +4,7 @@
 [ext_resource type="Shader" uid="uid://bqwptp8kc0ubh" path="res://shaders/death.gdshader" id="1_yfjof"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yfjof"]
+resource_local_to_scene = true
 shader = ExtResource("1_yfjof")
 shader_parameter/position = Vector2(0, 0)
 shader_parameter/radius = 0.0

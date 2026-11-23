@@ -38,10 +38,10 @@ func get_effect_type(effect: Effect) -> EffectTargetType:
 			return EffectTargetType.CHOSEN_ALLY
 		
 	# need to return something
-	assert("effect type was undefined")
 	return EffectTargetType.NONE
 	
 
+# defaults
 @export var effect : Effect = Effect.ATTACK
 @export var modifier: int = 1
 
@@ -53,13 +53,13 @@ func execute(target : CharacterInstance = null) -> void:
 			assert(target, "no target for an attack action")
 			var damage = modifier + target.vulnerable
 			if damage > target.block:
-				target.health -= damage - target.block
+				target.current_health -= damage - target.block
 				target.block = 0
 			else:
 				target.block -= damage
 				
-			if target.health < 0:
-				target.health = 0
+			if target.current_health < 0:
+				target.current_health = 0
 
 		Effect.DEFEND:
 			target.block += modifier

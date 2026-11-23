@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://2by5rxdywvdw"]
 
-[ext_resource type="Script" uid="uid://dam7m1tcawnc4" path="res://scripts/game_view.gd" id="1_gye2j"]
+[ext_resource type="Script" uid="uid://dam7m1tcawnc4" path="res://scripts/cards_view.gd" id="1_gye2j"]
 [ext_resource type="PackedScene" uid="uid://ckkuu3y8lf1xk" path="res://prefabs/deck.tscn" id="2_d6vn6"]
 [ext_resource type="PackedScene" uid="uid://cwi7gb64qr5e" path="res://prefabs/discard.tscn" id="3_s7wti"]
 
@@ -8,12 +8,12 @@
 script = ExtResource("1_gye2j")
 
 [node name="deck" parent="." unique_id=731650845 instance=ExtResource("2_d6vn6")]
-position = Vector2(180, 872)
+position = Vector2(-447.99994, 6.1035156e-05)
 scale = Vector2(0.33, 0.33)
 
 [node name="hand" type="Node2D" parent="." unique_id=1271941280]
-position = Vector2(630, 872)
+position = Vector2(2, 0)
 
 [node name="discard" parent="." unique_id=1605040543 instance=ExtResource("3_s7wti")]
-position = Vector2(1740, 872)
+position = Vector2(1112, 6.1035156e-05)
 scale = Vector2(0.33, 0.33)

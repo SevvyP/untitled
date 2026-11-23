@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://dnq0g2cpgk3v0"]
+
+[ext_resource type="Script" uid="uid://d17mx7fvl641l" path="res://scripts/reward_screen.gd" id="1_i1wdk"]
+
+[node name="reward_screen" type="CanvasLayer" unique_id=1350255139]
+process_mode = 2
+layer = 20
+script = ExtResource("1_i1wdk")
+
+[node name="dimmer" type="ColorRect" parent="." unique_id=39314468]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 64.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7019608)
+
+[node name="reward_panel" type="Control" parent="." unique_id=101049691]
+layout_mode = 3
+anchors_preset = 0
+offset_top = 64.0
+offset_right = 40.0
+offset_bottom = 96.0
+
+[node name="Label" type="Label" parent="reward_panel" unique_id=449821538]
+layout_mode = 0
+offset_left = 504.0
+offset_top = 104.0
+offset_right = 1448.0
+offset_bottom = 304.0
+theme_override_font_sizes/font_size = 142
+text = "Rewards"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="cards" type="HBoxContainer" parent="reward_panel" unique_id=1090191384]
+layout_mode = 0
+offset_left = 320.0
+offset_top = 344.0
+offset_right = 1600.0
+offset_bottom = 736.0
+
+[node name="next" type="Button" parent="reward_panel" unique_id=1600661631]
+layout_mode = 0
+offset_left = 704.0
+offset_top = 816.0
+offset_right = 1200.0
+offset_bottom = 944.0
+theme_override_font_sizes/font_size = 48
+text = "Next"
+
+[connection signal="pressed" from="reward_panel/next" to="." method="_on_next_pressed"]
