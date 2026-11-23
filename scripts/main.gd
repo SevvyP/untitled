@@ -5,7 +5,7 @@ extends Node2D
 @onready var max_health: Label = $max_health
 @onready var battle_scene : PackedScene = preload("res://scenes/battle.tscn")
 @onready var reward_screen : PackedScene = preload("res://prefabs/reward_screen.tscn")
-@onready var round_lost_screen : PackedScene = preload("res://prefabs/round_lost_screen.tscn")
+@onready var run_lost_screen : PackedScene = preload("res://prefabs/run_lost_screen.tscn")
 
 ## The initial state of the character at the start of the run. For now should just be the base stats,
 ## but in theory could be modified before passing in
@@ -63,11 +63,13 @@ func load_battle(deck : Array[CardInstance], character : CharacterInstance, enem
 	battle.combat_won_next.connect(_on_combat_won_next.bind())
 	return battle
 	
+	
+## Handles adding a card reward to the deck	
 func _on_card_reward_chosen(card : CardInstance):
 	deck.append(card)
 
 
-## move onto the next combat
+## Handles the next button press to move on from a combat
 func _on_combat_won_next():
 	for child in current_scene_placeholder.get_children():
 		child.queue_free()
@@ -77,7 +79,7 @@ func _on_combat_won_next():
 	load_battle(deck, character_instance, [enemy])
 
 
-## display the current deck
+## Handles displaying the deck when the icon is pressed in the top bar
 func _on_deck_pressed() -> void:
 	for card in deck:
 		print(card.data.card_name)

@@ -10,7 +10,7 @@ signal combat_won_next()
 @onready var enemy_reference : Enemy = $enemy
 @onready var character_reference : Character = $character
 @onready var reward_screen = preload("res://prefabs/reward_screen.tscn")
-@onready var round_lost_screen = preload("res://prefabs/round_lost_screen.tscn")
+@onready var run_lost_screen = preload("res://prefabs/run_lost_screen.tscn")
 
 ## Reference to the character being played this run. This is a global reference, so changes made
 ## during this combat will persist during the run. For example, taking damage should persist into
@@ -24,15 +24,17 @@ var enemy_instance : EnemyInstance
 ## of cards to be drawn each turn
 var game_state: GameState
 
+## The default hand size. Modificatoins should be handled by the gamestate
 const HAND_SIZE := 5
 
-## true when the game state is updating and player interactions should be paused
+## True when the game state is updating and player interactions should be paused
 var is_game_state_updating: bool = false
 
-## true when the round is over and actions should stop resolving
+## True when the round is over and actions should stop resolving
 var is_round_over : bool = false
 
-##
+## Sets up battle given a starting deck, the player character, and the enemies to fight
+## TODO: handle multiple enemeies
 func setup(deck : Array[CardInstance], character : CharacterInstance, enemy : EnemyData):
 	game_state = GameState.new()
 	assert(deck and character and enemy, "missing needed data to setup battle")
@@ -138,7 +140,7 @@ func resolve_card_effects(card_instance: CardInstance) -> void:
 					action.action_requests_change_to_game_state.connect(_apply_game_state_effect)
 				action.execute()
 
-## helper function for actions which effect the game state (ex: draw, gain mana)
+## Helper function for actions which effect the game state (ex: draw, gain mana)
 func _apply_game_state_effect(action : Action) -> void:
 	match action.effect:
 		Action.Effect.DRAW:
@@ -180,7 +182,7 @@ func discard_card(card_instance: CardInstance) -> void:
 	cards_view.update_discard_visual(game_state.discard)
 
 
-## Discards every card currently in the hand.[br]
+## Discards every card currently in the hand
 func discard_hand() -> void:
 	var cards: Array[CardInstance] = game_state.hand.duplicate()
 	cards.reverse()
@@ -227,16 +229,21 @@ func move_to_deck(card_instance: CardInstance) -> void:
 	cards_view.update_discard_visual(game_state.discard)
 	
 
+## Handles the signal emitted by an enemy when killed
+## TODO: only end combat if it's the last enemy standing
 func _on_enemy_died(dead_enemy: EnemyInstance) -> void:
 	is_round_over = true
 	await enemy_reference.animate_death()
 	combat_won()
 
+## Handles the signal emitted when the player is killed
 func _on_player_died(dead_player: CharacterInstance) -> void:
 	is_round_over = true
 	await character_reference.animate_death()
 	combat_lost()
 	
+## Wrap up the combat scene and display rewards
+## TODO: handle randomization of rewards	
 func combat_won() -> void:
 	var rewards = reward_screen.instantiate()
 	rewards.reward_chosen.connect(_on_reward_chosen.bind())
@@ -245,16 +252,18 @@ func combat_won() -> void:
 	end_turn_reference.queue_free()
 	self.add_child(rewards)
 	
+## Wrap up the combat scene and display the run lost screen	
 func combat_lost() -> void:
-	var round_lost = round_lost_screen.instantiate()
+	var round_lost = run_lost_screen.instantiate()
 	for child in get_children():
 		child.queue_free()
 	get_tree().current_scene.add_child(round_lost)
 
-## roundabout way to bus rewards back to main
+## Roundabout way to bus rewards selected back to main
 func _on_reward_chosen(card : CardInstance):
 	card_reward_chosen.emit(card)
 	
+## Roundabout way to bus next button pressed back to main
 func _on_rewards_next_pressed():
 	get_tree().paused = false
 	combat_won_next.emit()

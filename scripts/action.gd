@@ -41,6 +41,7 @@ func get_effect_type(effect: Effect) -> EffectTargetType:
 	return EffectTargetType.NONE
 	
 
+# defaults
 @export var effect : Effect = Effect.ATTACK
 @export var modifier: int = 1
 

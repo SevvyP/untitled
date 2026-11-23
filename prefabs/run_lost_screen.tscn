@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://duo6jk4vysf7h"]
 
-[node name="round_lost_screen" type="CanvasLayer" unique_id=1350255139]
+[node name="run_lost_screen" type="CanvasLayer" unique_id=1350255139]
 process_mode = 2
 layer = 20
 
@@ -13,14 +13,14 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.7019608)
 
-[node name="reward_panel" type="Control" parent="." unique_id=101049691]
+[node name="stats_panel" type="Control" parent="." unique_id=101049691]
 layout_mode = 3
 anchors_preset = 0
 offset_top = 64.0
 offset_right = 40.0
 offset_bottom = 104.0
 
-[node name="next" type="Button" parent="reward_panel" unique_id=153901440]
+[node name="next" type="Button" parent="stats_panel" unique_id=153901440]
 layout_mode = 0
 offset_left = 704.0
 offset_top = 808.0
@@ -29,19 +29,19 @@ offset_bottom = 936.0
 theme_override_font_sizes/font_size = 48
 text = "Next"
 
-[node name="stats" type="HBoxContainer" parent="reward_panel" unique_id=1270194998]
+[node name="stats" type="HBoxContainer" parent="stats_panel" unique_id=1270194998]
 layout_mode = 0
 offset_left = 320.0
 offset_top = 336.0
 offset_right = 1600.0
 offset_bottom = 728.0
 
-[node name="Label" type="Label" parent="reward_panel" unique_id=449821538]
+[node name="Label" type="Label" parent="stats_panel" unique_id=449821538]
 layout_mode = 0
 offset_left = 520.0
 offset_right = 1464.0
 offset_bottom = 200.0
 theme_override_font_sizes/font_size = 142
-text = "Round Lost"
+text = "Run Lost"
 horizontal_alignment = 1
 vertical_alignment = 1

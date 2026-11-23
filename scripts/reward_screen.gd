@@ -42,7 +42,7 @@ func _ready() -> void:
 		add_reward_card(CardInstance.new(load(path)))
 		
 	
-## add a card to the offered rewards cards	
+## Add a card to the offered rewards cards	
 func add_reward_card(data: CardInstance) -> void:
 	var slot := Button.new()
 	slot.flat = true
@@ -78,12 +78,14 @@ func add_reward_card(data: CardInstance) -> void:
 	slot.mouse_exited.connect(card._on_area_2d_mouse_exited)
 
 	
+## Handles the selection of a reward and emits the chosen reward to be handled up the tree
 func _on_reward_pressed(data: CardInstance) -> void:
 	selected_reward = data
 	reward_chosen.emit(selected_reward)
 	for child in cards_box.get_children():
 		child.queue_free()
 
+## Handles the next button being pressed and emits a signal to be handled up the tree
 func _on_next_pressed() -> void:
 	next_pressed.emit()
 	
