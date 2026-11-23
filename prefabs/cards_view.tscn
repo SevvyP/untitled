@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://2by5rxdywvdw"]
 
-[ext_resource type="Script" uid="uid://dam7m1tcawnc4" path="res://scripts/game_view.gd" id="1_gye2j"]
+[ext_resource type="Script" uid="uid://dam7m1tcawnc4" path="res://scripts/cards_view.gd" id="1_gye2j"]
 [ext_resource type="PackedScene" uid="uid://ckkuu3y8lf1xk" path="res://prefabs/deck.tscn" id="2_d6vn6"]
 [ext_resource type="PackedScene" uid="uid://cwi7gb64qr5e" path="res://prefabs/discard.tscn" id="3_s7wti"]
 

@@ -4,7 +4,7 @@ extends Node2D
 signal card_reward_chosen(card : CardInstance)
 signal combat_won_next()
 
-@onready var game_view: GameView = $game_view
+@onready var cards_view: GameView = $cards_view
 @onready var end_turn_reference: Button = $end_turn
 @onready var input_manager = $input_manager
 @onready var enemy_reference : Enemy = $enemy
@@ -54,8 +54,8 @@ func setup(deck : Array[CardInstance], character : CharacterInstance, enemy : En
 	game_state.build_deck(deck)
 
 	# update the starting states for deck and discard
-	game_view.update_deck_visual(game_state.deck.size())
-	game_view.update_discard_visual(game_state.discard)
+	cards_view.update_deck_visual(game_state.deck.size())
+	cards_view.update_discard_visual(game_state.discard)
 
 	is_game_state_updating = true
 	end_turn_reference.disabled = true
@@ -113,13 +113,13 @@ func _on_card_play_requested(card: Card) -> void:
 	
 	card.z_index = GameView.ANIMATION_Z_INDEX
 
-	await game_view.animate_card_play(card)
+	await cards_view.animate_card_play(card)
 
 	await discard_card(card.card_instance)
 	
 	await resolve_card_effects(card_instance)
 	
-	await game_view.animate_hand_layout(game_state.hand)
+	await cards_view.animate_hand_layout(game_state.hand)
 	
 	is_game_state_updating = false
 
@@ -168,16 +168,16 @@ func draw_card() -> void:
 	var card_instance: CardInstance = game_state.draw_card()
 	assert(card_instance, "draw card did not result in a card being drawn")
 
-	await game_view.animate_draw(card_instance, game_state.hand)
-	game_view.update_deck_visual(game_state.deck.size())
+	await cards_view.animate_draw(card_instance, game_state.hand)
+	cards_view.update_deck_visual(game_state.deck.size())
 
 
 ## Moves a card from from the hand to the discard pile
 func discard_card(card_instance: CardInstance) -> void:
 	assert(game_state.hand.has(card_instance), "attempted to discard a card that isn't in hand")
 	game_state.discard_card(card_instance)
-	await game_view.animate_discard(card_instance)
-	game_view.update_discard_visual(game_state.discard)
+	await cards_view.animate_discard(card_instance)
+	cards_view.update_discard_visual(game_state.discard)
 
 
 ## Discards every card currently in the hand.[br]
@@ -188,8 +188,8 @@ func discard_hand() -> void:
 	for card_instance in cards:
 		game_state.discard_card(card_instance)
 
-	await game_view.animate_discard_hand(cards)
-	game_view.update_discard_visual(game_state.discard)
+	await cards_view.animate_discard_hand(cards)
+	cards_view.update_discard_visual(game_state.discard)
 	
 	# add a small pause before the next action
 	await get_tree().create_timer(0.15).timeout
@@ -201,9 +201,9 @@ func shuffle_discard_into_deck() -> void:
 
 	var cards_to_shuffle: Array[CardInstance] = game_state.discard.duplicate()
 	game_state.shuffle_discard_into_deck()
-	await game_view.animate_shuffle(cards_to_shuffle)
-	game_view.update_deck_visual(game_state.deck.size())
-	game_view.update_discard_visual(game_state.discard)
+	await cards_view.animate_shuffle(cards_to_shuffle)
+	cards_view.update_deck_visual(game_state.deck.size())
+	cards_view.update_discard_visual(game_state.discard)
 
 
 ## Moves a card from the hand or discard pile to the top of the deck.[br]
@@ -218,13 +218,13 @@ func move_to_deck(card_instance: CardInstance) -> void:
 	game_state.move_to_deck(card_instance)
 
 	if was_in_hand:
-		await game_view.animate_hand_card_to_deck(card_instance)
-		await game_view.animate_hand_layout(game_state.hand)
+		await cards_view.animate_hand_card_to_deck(card_instance)
+		await cards_view.animate_hand_layout(game_state.hand)
 	else:
-		await game_view.animate_card_from_discard_to_deck(card_instance)
+		await cards_view.animate_card_from_discard_to_deck(card_instance)
 
-	game_view.update_deck_visual(game_state.deck.size())
-	game_view.update_discard_visual(game_state.discard)
+	cards_view.update_deck_visual(game_state.deck.size())
+	cards_view.update_discard_visual(game_state.discard)
 	
 
 func _on_enemy_died(dead_enemy: EnemyInstance) -> void:
@@ -241,7 +241,7 @@ func combat_won() -> void:
 	var rewards = reward_screen.instantiate()
 	rewards.reward_chosen.connect(_on_reward_chosen.bind())
 	rewards.next_pressed.connect(_on_rewards_next_pressed.bind())
-	game_view.queue_free()
+	cards_view.queue_free()
 	end_turn_reference.queue_free()
 	self.add_child(rewards)
 	
