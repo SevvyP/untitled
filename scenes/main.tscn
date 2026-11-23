@@ -1,6 +1,57 @@
 [gd_scene format=3 uid="uid://b3wyljbdtdh15"]
 
 [ext_resource type="Script" uid="uid://djx2nhrxalsg3" path="res://scripts/main.gd" id="1_o5qli"]
+[ext_resource type="Texture2D" uid="uid://cjqx7sjud1mfl" path="res://sprites/top_bar.png" id="2_0wfyh"]
+[ext_resource type="Texture2D" uid="uid://diukjo28mf6hw" path="res://sprites/heart.png" id="3_sugp2"]
+[ext_resource type="Texture2D" uid="uid://uhcinog8m7c5" path="res://sprites/card_back_demo.png" id="4_jyhfs"]
 
 [node name="main" type="Node2D" unique_id=1588589138]
 script = ExtResource("1_o5qli")
+
+[node name="TopBar" type="Sprite2D" parent="." unique_id=1771953659]
+position = Vector2(960, 32)
+texture = ExtResource("2_0wfyh")
+
+[node name="current_health" type="Label" parent="." unique_id=1735564743]
+offset_top = 16.0
+offset_right = 40.0
+offset_bottom = 55.0
+theme_override_font_sizes/font_size = 24
+text = "0"
+horizontal_alignment = 2
+
+[node name="Label2" type="Label" parent="." unique_id=831892295]
+offset_left = 40.0
+offset_top = 16.0
+offset_right = 56.0
+offset_bottom = 55.0
+theme_override_font_sizes/font_size = 24
+text = "/"
+
+[node name="max_health" type="Label" parent="." unique_id=1170817053]
+offset_left = 48.0
+offset_top = 16.0
+offset_right = 88.0
+offset_bottom = 55.0
+theme_override_font_sizes/font_size = 24
+text = "0"
+
+[node name="current_scene" type="Node2D" parent="." unique_id=723145301]
+position = Vector2(0, 64)
+
+[node name="Heart" type="Sprite2D" parent="." unique_id=1577168982]
+position = Vector2(104, 32)
+texture = ExtResource("3_sugp2")
+
+[node name="deck" type="Button" parent="." unique_id=147726092]
+offset_left = 1808.0
+offset_top = 8.0
+offset_right = 1840.0
+offset_bottom = 56.0
+
+[node name="CardBackDemo" type="Sprite2D" parent="deck" unique_id=1472986688]
+position = Vector2(16, 24.000004)
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("4_jyhfs")
+
+[connection signal="pressed" from="deck" to="." method="_on_deck_pressed"]

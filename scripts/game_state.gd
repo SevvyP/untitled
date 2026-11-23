@@ -10,14 +10,13 @@ var discard: Array[CardInstance] = []
 @export var player_mana : int = 0
 @export var player_gold : int = 0
 
-## Builds and shuffles the starting deck from CardData resources.
-func build_deck(starting_cards: Array[CardData]) -> void:
+## Builds and shuffles the starting deck
+func build_deck(starting_cards: Array[CardInstance]) -> void:
 	deck.clear()
 	hand.clear()
 	discard.clear()
 
-	for card_data in starting_cards:
-		deck.append(CardInstance.new(card_data))
+	deck.append_array(starting_cards)
 
 	deck.shuffle()
 

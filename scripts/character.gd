@@ -10,7 +10,7 @@ extends Node2D
 var character: CharacterInstance
 
 func _process(_delta: float) -> void:
-	health.text = str(character.health)
+	health.text = str(character.current_health)
 	vulnerable.text = str(character.vulnerable)
 	block.text = str(character.block)
 	

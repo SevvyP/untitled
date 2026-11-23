@@ -1,16 +1,14 @@
 [gd_scene format=3 uid="uid://duo6jk4vysf7h"]
 
-[ext_resource type="Script" uid="uid://d17mx7fvl641l" path="res://scripts/reward_screen.gd" id="1_8ck3k"]
-
-[node name="reward_screen" type="CanvasLayer" unique_id=1350255139]
+[node name="round_lost_screen" type="CanvasLayer" unique_id=1350255139]
 process_mode = 2
 layer = 20
-script = ExtResource("1_8ck3k")
 
 [node name="dimmer" type="ColorRect" parent="." unique_id=39314468]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = 64.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.7019608)
@@ -18,8 +16,25 @@ color = Color(0, 0, 0, 0.7019608)
 [node name="reward_panel" type="Control" parent="." unique_id=101049691]
 layout_mode = 3
 anchors_preset = 0
+offset_top = 64.0
 offset_right = 40.0
-offset_bottom = 40.0
+offset_bottom = 104.0
+
+[node name="next" type="Button" parent="reward_panel" unique_id=153901440]
+layout_mode = 0
+offset_left = 704.0
+offset_top = 808.0
+offset_right = 1200.0
+offset_bottom = 936.0
+theme_override_font_sizes/font_size = 48
+text = "Next"
+
+[node name="stats" type="HBoxContainer" parent="reward_panel" unique_id=1270194998]
+layout_mode = 0
+offset_left = 320.0
+offset_top = 336.0
+offset_right = 1600.0
+offset_bottom = 728.0
 
 [node name="Label" type="Label" parent="reward_panel" unique_id=449821538]
 layout_mode = 0
@@ -30,17 +45,3 @@ theme_override_font_sizes/font_size = 142
 text = "Round Lost"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="Button" type="Button" parent="reward_panel" unique_id=202784120]
-layout_mode = 0
-offset_left = 320.0
-offset_top = 248.0
-offset_right = 1624.0
-offset_bottom = 640.0
-
-[node name="Button2" type="Button" parent="reward_panel" unique_id=1600661631]
-layout_mode = 0
-offset_left = 552.0
-offset_top = 672.0
-offset_right = 1376.0
-offset_bottom = 1008.0

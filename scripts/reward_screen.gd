@@ -1,6 +1,7 @@
 extends CanvasLayer
 
-signal reward_chosen(data: CardData)
+signal reward_chosen(data: CardInstance)
+signal next_pressed()
 
 const DEFAULT_CARD_SCALE = Vector2(.33, .33)
 const CARD_SCENE: PackedScene = preload("res://prefabs/card.tscn")
@@ -13,7 +14,7 @@ const CARD_SCENE: PackedScene = preload("res://prefabs/card.tscn")
 @export var card_rewards : Array[Card]
 
 var reward_group := ButtonGroup.new()
-var selected_reward: CardData
+var selected_reward: CardInstance
 
 func _ready() -> void:
 	# Pause the background game scene
@@ -33,30 +34,16 @@ func _ready() -> void:
 	# add rewards to the screen
 	# TODO: pass in randomized card rewards
 	for path in [
-		"res://cards/srike.tres",
-		"res://cards/defend.tres",
-		"res://cards/draw.tres",
-		"res://cards/vulnerable.tres",
+		"res://cards/rare.tres",
+		"res://cards/rare.tres",
+		"res://cards/rare.tres",
+		"res://cards/rare.tres",
 	]:
-		add_reward_card(load(path) as CardData)
-	
-	for card in card_rewards:
-		$reward_panel/cards.add_child(card)
+		add_reward_card(CardInstance.new(load(path)))
 		
-		
-
-func close_rewards() -> void:
-	# Fade out before unpausing and destroying the overlay
-	var tween = create_tween().set_parallel(true)
-	tween.tween_property(dimmer, "modulate:a", 0.0, 0.2)
-	tween.tween_property(reward_panel, "modulate:a", 0.0, 0.2)
-	
-	await tween.finished
-	get_tree().paused = false
-	queue_free()
 	
 ## add a card to the offered rewards cards	
-func add_reward_card(data: CardData) -> void:
+func add_reward_card(data: CardInstance) -> void:
 	var slot := Button.new()
 	slot.flat = true
 	slot.toggle_mode = true
@@ -68,7 +55,7 @@ func add_reward_card(data: CardData) -> void:
 
 	var card := CARD_SCENE.instantiate() as Card
 	slot.add_child(card)
-	card.setup(data)
+	card.setup(data.data)
 	card.scale = Card.CARD_DEFAULT_SCALE
 	card_rewards.append(card)
 
@@ -91,11 +78,12 @@ func add_reward_card(data: CardData) -> void:
 	slot.mouse_exited.connect(card._on_area_2d_mouse_exited)
 
 	
-func _on_reward_pressed(data: CardData) -> void:
+func _on_reward_pressed(data: CardInstance) -> void:
 	selected_reward = data
+	reward_chosen.emit(selected_reward)
 	for child in cards_box.get_children():
 		child.queue_free()
 
 func _on_next_pressed() -> void:
-	reward_chosen.emit(selected_reward)
-	close_rewards()
+	next_pressed.emit()
+	

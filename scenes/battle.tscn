@@ -15,6 +15,7 @@ size = Vector2(1920, 640)
 script = ExtResource("1_4k1nj")
 
 [node name="game_view" parent="." unique_id=253964812 instance=ExtResource("2_f4pi3")]
+position = Vector2(632, 864)
 
 [node name="end_turn" type="Button" parent="." unique_id=1904866195]
 offset_left = 96.0
@@ -22,6 +23,7 @@ offset_top = 640.0
 offset_right = 264.0
 offset_bottom = 703.0
 text = "End turn"
+metadata/_edit_use_anchors_ = true
 
 [node name="input_manager" type="Node2D" parent="." unique_id=1147601031]
 script = ExtResource("3_yahae")

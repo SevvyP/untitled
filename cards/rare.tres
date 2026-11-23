@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://25slyjd6ovuv"]
+
+[ext_resource type="Script" uid="uid://yegwd4iidb46" path="res://scripts/card_data.gd" id="1_aalmw"]
+[ext_resource type="Script" uid="uid://b8j2sh1fyayd1" path="res://scripts/action.gd" id="1_xgxia"]
+[ext_resource type="Script" uid="uid://bpi6qpqgcuu7o" path="res://scripts/ability.gd" id="2_3rfbg"]
+[ext_resource type="Texture2D" uid="uid://mq5d66i34mle" path="res://sprites/rare.png" id="3_1gv57"]
+
+[sub_resource type="Resource" id="Resource_evn7o"]
+script = ExtResource("1_xgxia")
+modifier = 400
+metadata/_custom_type_script = "uid://b8j2sh1fyayd1"
+
+[sub_resource type="Resource" id="Resource_dhlnb"]
+script = ExtResource("2_3rfbg")
+actions = Array[ExtResource("1_xgxia")]([SubResource("Resource_evn7o")])
+metadata/_custom_type_script = "uid://bpi6qpqgcuu7o"
+
+[resource]
+script = ExtResource("1_aalmw")
+card_name = "Rare"
+cost = 3
+description = "Deal 400 damage"
+art = ExtResource("3_1gv57")
+ability = SubResource("Resource_dhlnb")
+metadata/_custom_type_script = "uid://yegwd4iidb46"

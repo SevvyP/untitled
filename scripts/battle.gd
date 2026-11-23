@@ -1,4 +1,8 @@
+class_name Battle
 extends Node2D
+
+signal card_reward_chosen(card : CardInstance)
+signal combat_won_next()
 
 @onready var game_view: GameView = $game_view
 @onready var end_turn_reference: Button = $end_turn
@@ -8,10 +12,16 @@ extends Node2D
 @onready var reward_screen = preload("res://prefabs/reward_screen.tscn")
 @onready var round_lost_screen = preload("res://prefabs/round_lost_screen.tscn")
 
-@export var starting_deck: Array[CardData] = []
-var enemy : EnemyInstance
-var character : CharacterInstance
+## Reference to the character being played this run. This is a global reference, so changes made
+## during this combat will persist during the run. For example, taking damage should persist into
+## the next battle
+var character_instance : CharacterInstance
 
+## Instantated logical state of the enemy being fought
+var enemy_instance : EnemyInstance
+
+## State of the current battle. Contains deck, hand, discard, plus modifiers like modifiers on number
+## of cards to be drawn each turn
 var game_state: GameState
 
 const HAND_SIZE := 5
@@ -22,41 +32,26 @@ var is_game_state_updating: bool = false
 ## true when the round is over and actions should stop resolving
 var is_round_over : bool = false
 
-## Initializes the game state, builds the starting deck, and draws the first hand
-func _ready() -> void:
+##
+func setup(deck : Array[CardInstance], character : CharacterInstance, enemy : EnemyData):
 	game_state = GameState.new()
-	enemy = EnemyInstance.new(load("res://enemies/winorlose.tres"))
-	enemy_reference.setup(enemy)
+	assert(deck and character and enemy, "missing needed data to setup battle")
+	character_instance = character
+	enemy_instance = EnemyInstance.new(enemy)
 	
-	character = CharacterInstance.new(load("res://characters/untitled.tres"))
-	character_reference.setup(character)
+	enemy_reference.setup(enemy_instance)
+	character_reference.setup(character_instance)
 	
-	# bind signals
-	enemy.died.connect(_on_enemy_died.bind(enemy))
-	character.died.connect(_on_player_died.bind(character))
+	enemy_instance.died.connect(_on_enemy_died.bind(enemy_instance))
+	character_instance.died.connect(_on_player_died.bind(character_instance))
 	
 	input_manager.card_play_requested.connect(_on_card_play_requested)
 
-	# hacky way to prevent issues with the fiest card dealt
+	# hacky way to prevent issues with the first card dealt
 	await get_tree().create_timer(0.15).timeout
 
-	# TODO: build and assign starting deck instead of placeholder
-	var Strike: CardData = load("res://cards/srike.tres")
-	var Defend: CardData = load("res://cards/defend.tres")
-	var Draw: CardData = load("res://cards/draw.tres")
-	var Vulnerable: CardData = load("res://cards/vulnerable.tres")
-	for i in range(10):
-		if i % 4 == 0:
-			starting_deck.append(Vulnerable)
-		if i % 3 == 0:
-			starting_deck.append(Strike)
-		elif i % 2 == 0:
-			starting_deck.append(Draw)
-		else:
-			starting_deck.append(Defend)
-
 	# TODO: randomize() seed the global RNG for shuffle()
-	game_state.build_deck(starting_deck)
+	game_state.build_deck(deck)
 
 	# update the starting states for deck and discard
 	game_view.update_deck_visual(game_state.deck.size())
@@ -70,7 +65,6 @@ func _ready() -> void:
 
 	is_game_state_updating = false
 	end_turn_reference.disabled = false
-
 
 ## Resolves the end of the player's turn, triggers enemy turns, resolves the start 
 ## of the player's next turn, then draws a new hand
@@ -90,15 +84,15 @@ func _on_button_pressed() -> void:
 
 	# trigger enemy turns
 	# TODO: pass in any targets if more than just player
-	await enemy.execute_next_turn([character])
+	await enemy_instance.execute_next_turn([character_instance])
 	if is_round_over:
 		return
 
 	# resolve start of next player turn
-	character.vulnerable -= 1
-	if character.vulnerable < 0:
-		character.vulnerable = 0
-	character.block = 0
+	character_instance.vulnerable -= 1
+	if character_instance.vulnerable < 0:
+		character_instance.vulnerable = 0
+	character_instance.block = 0
 
 	# draw a new hand
 	for i in range(HAND_SIZE):
@@ -136,9 +130,9 @@ func resolve_card_effects(card_instance: CardInstance) -> void:
 	for action in card_instance.data.ability.actions:
 		match action.get_effect_type(action.effect):
 			Action.EffectTargetType.CHOSEN_ENEMY:
-				action.execute(enemy)
+				action.execute(enemy_instance)
 			Action.EffectTargetType.CHOSEN_ALLY:
-				action.execute(character)
+				action.execute(character_instance)
 			Action.EffectTargetType.NONE:
 				if not action.action_requests_change_to_game_state.is_connected(_apply_game_state_effect):
 					action.action_requests_change_to_game_state.connect(_apply_game_state_effect)
@@ -245,8 +239,22 @@ func _on_player_died(dead_player: CharacterInstance) -> void:
 	
 func combat_won() -> void:
 	var rewards = reward_screen.instantiate()
-	get_tree().current_scene.add_child(rewards)
+	rewards.reward_chosen.connect(_on_reward_chosen.bind())
+	rewards.next_pressed.connect(_on_rewards_next_pressed.bind())
+	game_view.queue_free()
+	end_turn_reference.queue_free()
+	self.add_child(rewards)
 	
 func combat_lost() -> void:
 	var round_lost = round_lost_screen.instantiate()
+	for child in get_children():
+		child.queue_free()
 	get_tree().current_scene.add_child(round_lost)
+
+## roundabout way to bus rewards back to main
+func _on_reward_chosen(card : CardInstance):
+	card_reward_chosen.emit(card)
+	
+func _on_rewards_next_pressed():
+	get_tree().paused = false
+	combat_won_next.emit()

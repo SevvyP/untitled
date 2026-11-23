@@ -11,7 +11,7 @@ var enemy : EnemyInstance
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	health.text = str(enemy.health)
+	health.text = str(enemy.current_health)
 	vulnerable.text = str(enemy.vulnerable)
 	block.text = str(enemy.block)
 	

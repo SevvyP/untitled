@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="untitled"
-run/main_scene="uid://bdl7xusvr57e5"
+run/main_scene="uid://b3wyljbdtdh15"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
